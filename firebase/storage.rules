@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isManager() {
+      return isAuthenticated() && (request.auth.token.role == 'manager' || request.auth.token.role == 'admin');
+    }
+
+    // Public product and banner images
+    match /products/{allPaths=**} {
+      allow read: if true;
+      allow write: if isManager();
+    }
+    
+    match /banners/{allPaths=**} {
+      allow read: if true;
+      allow write: if isManager();
+    }
+
+    // Support ticket attachments
+    match /support/{ticketId}/{fileName} {
+      allow read: if isManager() || (isAuthenticated() && request.auth.uid == request.resource.metadata.userId);
+      allow write: if isAuthenticated() && request.resource.size < 5 * 1024 * 1024; // 5MB limit
+    }
+  }
+}
