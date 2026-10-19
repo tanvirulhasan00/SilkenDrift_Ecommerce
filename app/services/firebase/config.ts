@@ -5,27 +5,41 @@ import { getStorage, FirebaseStorage } from "firebase/storage";
 import { getAnalytics, isSupported, Analytics } from "firebase/analytics";
 
 export const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAH-WubmiilrnFZk53WPTMeXT8FwIgHgOQ",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "daktarkhana-test-db.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "daktarkhana-test-db",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "daktarkhana-test-db.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "595413880552",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:595413880552:web:f2977074c3aa7cc9ac835d",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-77PZNP9T29",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "",
 };
 
 export const isFirebaseConfigured = (): boolean => {
   return Boolean(
     firebaseConfig.apiKey &&
     firebaseConfig.projectId &&
-    !firebaseConfig.apiKey.includes("DEMO")
+    !firebaseConfig.apiKey.includes("DEMO") &&
+    !firebaseConfig.apiKey.includes("your_") &&
+    !firebaseConfig.apiKey.includes("mock")
   );
 };
 
-// Initialize Firebase App singleton
+// Initialize Firebase App singleton safely
+const isConfigured = isFirebaseConfigured();
 const app: FirebaseApp = getApps().length > 0
   ? getApp()
-  : initializeApp(firebaseConfig);
+  : initializeApp(
+      isConfigured
+        ? firebaseConfig
+        : {
+            apiKey: "mock-api-key",
+            authDomain: "silkendrift-mock.firebaseapp.com",
+            projectId: "silkendrift-mock",
+            storageBucket: "silkendrift-mock.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:mockappid",
+          }
+    );
 
 export const auth: Auth = getAuth(app);
 export const db: Firestore = getFirestore(app);

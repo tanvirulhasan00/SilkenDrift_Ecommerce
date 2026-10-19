@@ -657,7 +657,7 @@ export default function AdminSettingsPage() {
               <span>One-Click Live Firestore Synchronization</span>
             </div>
             <p className="text-[11px] text-amber-800 dark:text-amber-300">
-              Populates all authentic Bangladesh handloom products, categories, pickup hubs, and store metadata into your live Firestore collections (<code className="font-mono text-[10px] bg-amber-100 dark:bg-amber-900/50 px-1 py-0.5 rounded">daktarkhana-test-db</code>).
+              Populates all authentic Bangladesh handloom products, categories, pickup hubs, and store metadata into your live Firestore collections (<code className="font-mono text-[10px] bg-amber-100 dark:bg-amber-900/50 px-1 py-0.5 rounded">{firebaseConfig.projectId || "Configured Firestore"}</code>).
             </p>
           </div>
 
