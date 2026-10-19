@@ -24,6 +24,10 @@ export const links = () => [
     href: "https://fonts.gstatic.com",
     crossOrigin: "anonymous",
   },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap",
+  },
   { rel: "stylesheet", href: stylesheet },
 ];
 
@@ -61,6 +65,37 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+export function HydrateFallback() {
+  return (
+    <div className="min-h-[70vh] flex flex-col items-center justify-center p-6 text-center">
+      <div className="flex flex-col items-center gap-4">
+        {/* Brand Crest */}
+        <div className="w-16 h-16 rounded-2xl bg-silk-950 dark:bg-silk-900 flex items-center justify-center shadow-luxury border border-gold-400/40">
+          <svg className="w-10 h-10 text-gold-400 animate-pulse" viewBox="0 0 64 64" fill="none">
+            <path d="M32 10 L50 28 L32 54 L14 28 Z" stroke="currentColor" strokeWidth="3" strokeLinejoin="round"/>
+            <path d="M32 16 L44 28 L32 46 L20 28 Z" fill="currentColor"/>
+            <circle cx="32" cy="28" r="3.5" fill="#ffffff"/>
+          </svg>
+        </div>
+
+        <div>
+          <h2 className="font-serif font-bold text-2xl text-silk-950 dark:text-silk-50 tracking-tight">
+            SilkenDrift
+          </h2>
+          <p className="text-[11px] font-semibold tracking-widest uppercase text-gold-600 dark:text-gold-400 mt-1">
+            হেরিটেজ বেঙ্গল সিল্ক • রাজকীয় হস্তশিল্প
+          </p>
+        </div>
+
+        {/* Shimmer Loading Bar */}
+        <div className="w-44 h-1.5 bg-silk-200 dark:bg-dark-border rounded-full overflow-hidden mt-2 relative">
+          <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-gold-400 to-amber-500 rounded-full animate-shimmer" />
+        </div>
+      </div>
+    </div>
   );
 }
 

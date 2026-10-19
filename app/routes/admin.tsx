@@ -34,7 +34,7 @@ import {
 } from "lucide-react";
 
 export default function AdminLayout() {
-  const { user, role, isAdmin, isManager, isDemo, loginDemo, logout } = useAuth();
+  const { user, role, isAdmin, isManager, isDemo, isLoading, loginDemo, logout } = useAuth();
   const { language, t } = useLanguage();
   const { settings } = useSettings();
   const [logoError, setLogoError] = useState(false);
@@ -141,6 +141,22 @@ export default function AdminLayout() {
       adminOnly: true, // Only Admin
     },
   ];
+
+  // Show smooth luxury loader if auth is still resolving
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-silk-50 dark:bg-dark-bg">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-silk-950 flex items-center justify-center text-gold-400 animate-pulse">
+            <Lock className="w-5 h-5" />
+          </div>
+          <p className="text-xs font-semibold text-silk-600 dark:text-silk-400">
+            {language === "bn" ? "অ্যাডমিন অনুমতি যাচাই করা হচ্ছে..." : "Verifying staff access..."}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // Role Gate check: require at least Manager
   if (!isManager) {

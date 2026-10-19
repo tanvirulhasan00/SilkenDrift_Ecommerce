@@ -20,10 +20,12 @@ import {
 } from "lucide-react";
 
 export async function clientLoader() {
-  const orders = await firestoreService.getOrders();
-  const products = await firestoreService.getProducts();
+  const [orders, products, contactMessages] = await Promise.all([
+    firestoreService.getOrders(),
+    firestoreService.getProducts(),
+    firestoreService.getContactMessages(),
+  ]);
   const tickets = mockRepository.getSupportTickets();
-  const contactMessages = await firestoreService.getContactMessages();
 
   const totalRevenue = orders
     .filter((o) => o.paymentStatus === "paid" || o.paymentStatus === "cod_collected")

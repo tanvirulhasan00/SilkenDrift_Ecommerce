@@ -169,8 +169,30 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<UserProfile | null>(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          firestoreService.setDemoMode(parsed.isDemo !== false);
+          return parsed;
+        }
+      } catch {}
+    }
+    return null;
+  });
+
+  const [isLoading, setIsLoading] = useState<boolean>(() => {
+    // If a cached user already exists, never block rendering
+    if (typeof window !== "undefined") {
+      try {
+        const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+        if (raw) return false;
+      } catch {}
+    }
+    return false;
+  });
 
   // Sync firestoreService isolation mode whenever user changes
   useEffect(() => {
@@ -178,27 +200,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     firestoreService.setDemoMode(isDemo);
   }, [user]);
 
-  // Initial load
+  // Check Firebase Auth in background without blocking initial UI
   useEffect(() => {
-    // 1. Check local session storage first
-    let initialUser: UserProfile | null = null;
-    try {
-      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (raw) {
-        initialUser = JSON.parse(raw);
-      }
-    } catch {
-      // ignore JSON errors
-    }
-
-    if (initialUser) {
-      setUser(initialUser);
-      firestoreService.setDemoMode(initialUser.isDemo !== false);
+    if (user) {
       setIsLoading(false);
       return;
     }
 
-    // 2. If Firebase Auth is configured and ready, check auth state
+    // If Firebase Auth is configured and ready, check auth state
     if (isFirebaseConfigured() && auth) {
       const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
         if (fbUser) {

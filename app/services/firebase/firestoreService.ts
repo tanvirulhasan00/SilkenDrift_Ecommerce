@@ -45,6 +45,13 @@ class FirestoreService {
   private hasLiveFirestore: boolean = false;
   public isDemoMode: boolean = true; // Safe default: Demo mode until authenticated as real user
 
+  // In-memory cache for ultra-fast startup and page transitions
+  private productsCache: Product[] | null = null;
+  private productsCacheTime: number = 0;
+  private settingsCache: BusinessSettings | null = null;
+  private settingsCacheTime: number = 0;
+  private readonly CACHE_TTL_MS: number = 60000; // 60 seconds
+
   constructor() {
     this.hasLiveFirestore = isFirebaseConfigured();
   }
@@ -74,6 +81,11 @@ class FirestoreService {
       return mockRepository.getProducts();
     }
 
+    // Serve from memory cache if fresh
+    if (this.productsCache && Date.now() - this.productsCacheTime < this.CACHE_TTL_MS) {
+      return this.productsCache;
+    }
+
     try {
       const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
@@ -83,10 +95,14 @@ class FirestoreService {
         return mockRepository.getProducts();
       }
 
-      return snapshot.docs.map((docSnap) => ({
+      const products = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data(),
       })) as Product[];
+
+      this.productsCache = products;
+      this.productsCacheTime = Date.now();
+      return products;
     } catch (err) {
       console.warn("Firestore getProducts fallback to local store:", err);
       return mockRepository.getProducts();
@@ -144,6 +160,7 @@ class FirestoreService {
    * Save or update product in Firestore (real mode) or local mock store (demo mode)
    */
   async saveProduct(product: Product): Promise<Product> {
+    this.productsCache = null; // Invalidate cache
     // Always keep mockRepository in sync
     mockRepository.saveProduct(product);
 
@@ -168,6 +185,7 @@ class FirestoreService {
    * Delete product from Firestore (real mode) or local mock store (demo mode)
    */
   async deleteProduct(id: string): Promise<boolean> {
+    this.productsCache = null; // Invalidate cache
     mockRepository.deleteProduct(id);
 
     // Delete from live Firestore only for real staff
@@ -659,9 +677,13 @@ class FirestoreService {
   // ==========================================
 
   /**
-   * Fetch business settings from Firestore or local mock store
+   * Fetch business settings from Firestore or local mock store with in-memory caching
    */
   async getSettings(): Promise<BusinessSettings> {
+    if (this.settingsCache && Date.now() - this.settingsCacheTime < this.CACHE_TTL_MS) {
+      return this.settingsCache;
+    }
+
     if (this.hasLiveFirestore) {
       try {
         const settingsRef = doc(db, "settings", "business");
@@ -672,8 +694,10 @@ class FirestoreService {
             id: docSnap.id,
             ...docSnap.data(),
           } as BusinessSettings;
-          // Keep local mock repository synchronized
+          // Keep local mock repository and memory cache synchronized
           mockRepository.updateSettings(liveSettings);
+          this.settingsCache = liveSettings;
+          this.settingsCacheTime = Date.now();
           return liveSettings;
         }
       } catch (err) {
@@ -681,7 +705,10 @@ class FirestoreService {
       }
     }
 
-    return mockRepository.getSettings();
+    const localSettings = mockRepository.getSettings();
+    this.settingsCache = localSettings;
+    this.settingsCacheTime = Date.now();
+    return localSettings;
   }
 
   /**
@@ -689,6 +716,8 @@ class FirestoreService {
    */
   async saveSettings(settings: Partial<BusinessSettings>): Promise<BusinessSettings> {
     const updated = mockRepository.updateSettings(settings);
+    this.settingsCache = updated;
+    this.settingsCacheTime = Date.now();
 
     if (this.hasLiveFirestore) {
       try {
@@ -725,6 +754,8 @@ class FirestoreService {
                 ...docSnap.data(),
               } as BusinessSettings;
               mockRepository.updateSettings(liveSettings);
+              this.settingsCache = liveSettings;
+              this.settingsCacheTime = Date.now();
               callback(liveSettings);
             }
           },

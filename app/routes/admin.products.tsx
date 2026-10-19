@@ -22,8 +22,10 @@ import {
 } from "lucide-react";
 
 export async function clientLoader() {
-  const products = await firestoreService.getProducts();
-  const categories = await firestoreService.getCategories();
+  const [products, categories] = await Promise.all([
+    firestoreService.getProducts(),
+    firestoreService.getCategories(),
+  ]);
   const brands = mockRepository.getBrands();
   return { products, categories, brands };
 }
