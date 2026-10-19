@@ -668,10 +668,10 @@ function ProductEditorForm({
 
           {/* Section 2: DYNAMIC Default Product Images Gallery */}
           <div className="bg-white rounded-2xl border border-silk-200 p-5 shadow-card dark:bg-dark-surface dark:border-dark-border space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-silk-100 dark:border-dark-border">
-              <div>
-                <h2 className="text-sm font-bold text-silk-950 dark:text-silk-100 flex items-center gap-2">
-                  <ImageIcon className="w-4 h-4 text-gold-600" />
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 pb-3 border-b border-silk-100 dark:border-dark-border">
+              <div className="min-w-0">
+                <h2 className="text-sm font-bold text-silk-950 dark:text-silk-100 flex items-center gap-2 flex-wrap">
+                  <ImageIcon className="w-4 h-4 text-gold-600 shrink-0" />
                   <span>Default Product Images (Dynamic Gallery)</span>
                   <span className="text-xs px-2 py-0.5 rounded-full bg-silk-100 text-silk-800 dark:bg-dark-elevated dark:text-silk-200 font-mono">
                     {prodImages.filter(Boolean).length} Photos
@@ -682,11 +682,11 @@ function ProductEditorForm({
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <button
                   type="button"
                   onClick={() => setIsDriveGuideOpen(!isDriveGuideOpen)}
-                  className="text-xs px-2.5 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gold-700 dark:text-gold-400 font-bold transition flex items-center gap-1 shrink-0 hover:border-gold-500"
+                  className="text-xs px-2.5 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gold-700 dark:text-gold-400 font-bold transition flex items-center gap-1 shrink-0 hover:border-gold-500 shadow-xs"
                 >
                   <HelpCircle className="w-3.5 h-3.5" />
                   <span>Google Drive Guide</span>
@@ -696,10 +696,10 @@ function ProductEditorForm({
                 <button
                   type="button"
                   onClick={fillSampleSareeImages}
-                  className="text-xs px-3 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-silk-100 hover:bg-silk-200 dark:bg-dark-elevated dark:hover:bg-dark-border text-silk-900 dark:text-silk-100 font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs hover:border-gold-500"
+                  className="text-xs px-3 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-silk-100 hover:bg-silk-200 dark:bg-dark-elevated dark:hover:bg-dark-border text-silk-900 dark:text-silk-100 font-bold transition flex items-center gap-1.5 shrink-0 shadow-xs hover:border-gold-500 whitespace-nowrap"
                 >
                   <Sparkles className="w-3.5 h-3.5 text-gold-600 dark:text-gold-400" />
-                  <span>Fill 4 Sample Saree Photos</span>
+                  <span>Fill 4 Sample Photos</span>
                 </button>
 
                 <Button
@@ -707,7 +707,7 @@ function ProductEditorForm({
                   size="sm"
                   variant="gold"
                   onClick={handleAddProductImage}
-                  className="text-xs font-bold"
+                  className="text-xs font-bold whitespace-nowrap shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   <span>Add Image</span>
@@ -875,10 +875,10 @@ function ProductEditorForm({
 
           {/* Section 3: DYNAMIC Product Variants & Multiple Images Manager */}
           <div className="bg-white rounded-2xl border border-silk-200 p-5 shadow-card dark:bg-dark-surface dark:border-dark-border space-y-4">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pb-3 border-b border-silk-100 dark:border-dark-border">
-              <div>
-                <h2 className="text-sm font-bold text-silk-950 dark:text-silk-100 flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-gold-600" />
+            <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3 pb-3 border-b border-silk-100 dark:border-dark-border">
+              <div className="min-w-0">
+                <h2 className="text-sm font-bold text-silk-950 dark:text-silk-100 flex items-center gap-2 flex-wrap">
+                  <Layers className="w-4 h-4 text-gold-600 shrink-0" />
                   <span>Product Variants ({prodVariants.length})</span>
                 </h2>
                 <p className="text-[11px] text-silk-600 dark:text-silk-400 mt-0.5">
@@ -886,12 +886,12 @@ function ProductEditorForm({
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 {prodVariants.length === 0 && (
                   <button
                     type="button"
                     onClick={handleAddSampleVariants}
-                    className="text-xs px-3 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-silk-100 hover:bg-silk-200 dark:bg-dark-surface dark:hover:bg-dark-elevated text-silk-900 dark:text-silk-100 font-bold transition flex items-center gap-1.5 shadow-xs hover:border-gold-500"
+                    className="text-xs px-3 py-1.5 rounded-xl border border-silk-300 dark:border-dark-border bg-silk-100 hover:bg-silk-200 dark:bg-dark-surface dark:hover:bg-dark-elevated text-silk-900 dark:text-silk-100 font-bold transition flex items-center gap-1.5 shadow-xs hover:border-gold-500 whitespace-nowrap"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-gold-600 dark:text-gold-400" />
                     <span>Generate Sample Color Variants</span>
@@ -910,7 +910,7 @@ function ProductEditorForm({
                       handleOpenAddVariant();
                     }
                   }}
-                  className="text-xs font-bold"
+                  className="text-xs font-bold whitespace-nowrap shrink-0 shadow-xs"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" />
                   <span>{isAddingVariant && !editingVariantId ? "Close Form" : "Add Variant"}</span>
@@ -1445,6 +1445,31 @@ function ProductEditorForm({
           </div>
         </div>
       </form>
+
+      {/* Mobile Sticky Save Action Bar */}
+      <div className="sm:hidden sticky bottom-3 z-30 flex items-center justify-between gap-3 p-3.5 rounded-2xl bg-white/95 dark:bg-dark-surface/95 backdrop-blur-md border border-silk-200 dark:border-dark-border shadow-2xl">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={() => navigate(getAdminPath("products"))}
+          disabled={isSubmitting}
+          className="flex-1 text-xs"
+        >
+          Discard
+        </Button>
+        <Button
+          type="button"
+          variant="gold"
+          size="sm"
+          onClick={handleSaveProduct}
+          disabled={isSubmitting}
+          className="flex-1 font-bold shadow-md text-xs"
+        >
+          <Save className="w-3.5 h-3.5 mr-1" />
+          <span>{isSubmitting ? "Saving..." : isCreateMode ? "Publish" : "Update"}</span>
+        </Button>
+      </div>
     </div>
   );
 }

@@ -222,7 +222,7 @@ export default function AdminOverviewPage() {
         </div>
 
         {/* Dynamic CSS Bar Chart */}
-        <div className="pt-6 grid grid-cols-7 gap-3 sm:gap-6 items-end h-48 border-b border-silk-100 dark:border-dark-border pb-3">
+        <div className="pt-6 grid grid-cols-7 gap-1.5 sm:gap-4 md:gap-6 items-end h-48 border-b border-silk-100 dark:border-dark-border pb-3">
           {[
             { day: "Sat", bdt: 42000, height: "45%" },
             { day: "Sun", bdt: 68000, height: "70%" },

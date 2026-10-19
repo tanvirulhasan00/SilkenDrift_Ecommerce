@@ -133,10 +133,10 @@ export default function AccountPage() {
       </div>
 
       {/* Tabs Bar */}
-      <div className="flex items-center gap-2 border-b border-silk-200 dark:border-dark-border overflow-x-auto pb-1">
+      <div className="flex items-center gap-2 border-b border-silk-200 dark:border-dark-border overflow-x-auto pb-1 scrollbar-none">
         <button
           onClick={() => handleTabChange("orders")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold whitespace-nowrap shrink-0 transition ${
             activeTab === "orders" || activeTab === "track"
               ? "border-b-2 border-gold-500 text-silk-950 dark:text-gold-300 font-bold bg-silk-100/80 dark:bg-dark-elevated"
               : "text-silk-600 hover:text-silk-950 hover:bg-silk-50 dark:text-silk-400 dark:hover:text-white dark:hover:bg-dark-elevated"
@@ -148,7 +148,7 @@ export default function AccountPage() {
 
         <button
           onClick={() => handleTabChange("wishlist")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold whitespace-nowrap shrink-0 transition ${
             activeTab === "wishlist"
               ? "border-b-2 border-gold-500 text-silk-950 dark:text-gold-300 font-bold bg-silk-100/80 dark:bg-dark-elevated"
               : "text-silk-600 hover:text-silk-950 hover:bg-silk-50 dark:text-silk-400 dark:hover:text-white dark:hover:bg-dark-elevated"
@@ -160,7 +160,7 @@ export default function AccountPage() {
 
         <button
           onClick={() => handleTabChange("support")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-t-xl text-xs font-semibold whitespace-nowrap shrink-0 transition ${
             activeTab === "support"
               ? "border-b-2 border-gold-500 text-silk-950 dark:text-gold-300 font-bold bg-silk-100/80 dark:bg-dark-elevated"
               : "text-silk-600 hover:text-silk-950 hover:bg-silk-50 dark:text-silk-400 dark:hover:text-white dark:hover:bg-dark-elevated"

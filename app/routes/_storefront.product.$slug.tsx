@@ -308,7 +308,7 @@ export default function ProductDetailPage() {
                       key={`${item.url}_${idx}`}
                       type="button"
                       onClick={() => handleSelectThumbnail(idx)}
-                      className={`relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 transition group ${
+                      className={`relative h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl border-2 transition group ${
                         isSelected
                           ? "border-gold-500 ring-2 ring-gold-400/40 shadow-md scale-102"
                           : isCurrentVariant
@@ -531,27 +531,29 @@ export default function ProductDetailPage() {
                 {t.product.buyNow}
               </Button>
 
-              <button
-                type="button"
-                onClick={() => dispatch(toggleWishlist(product.slug))}
-                className={`p-3.5 rounded-xl border transition ${
-                  isWishlisted
-                    ? "bg-crimson-50 border-crimson-300 text-crimson-600 hover:bg-crimson-600 hover:text-white hover:border-crimson-600 dark:bg-crimson-950/40 dark:border-crimson-800 dark:hover:bg-crimson-600 dark:hover:text-white"
-                    : "border-silk-300 text-silk-700 hover:bg-crimson-50 hover:text-crimson-600 hover:border-crimson-300 dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated dark:hover:text-crimson-400 dark:hover:border-crimson-800"
-                }`}
-                aria-label="Save to Wishlist"
-              >
-                <Heart className={`w-5 h-5 ${isWishlisted ? "fill-crimson-600" : ""}`} />
-              </button>
+              <div className="flex gap-3 sm:contents">
+                <button
+                  type="button"
+                  onClick={() => dispatch(toggleWishlist(product.slug))}
+                  className={`flex-1 sm:flex-initial p-3.5 rounded-xl border transition flex items-center justify-center ${
+                    isWishlisted
+                      ? "bg-crimson-50 border-crimson-300 text-crimson-600 hover:bg-crimson-600 hover:text-white hover:border-crimson-600 dark:bg-crimson-950/40 dark:border-crimson-800 dark:hover:bg-crimson-600 dark:hover:text-white"
+                      : "border-silk-300 text-silk-700 hover:bg-crimson-50 hover:text-crimson-600 hover:border-crimson-300 dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated dark:hover:text-crimson-400 dark:hover:border-crimson-800"
+                  }`}
+                  aria-label="Save to Wishlist"
+                >
+                  <Heart className={`w-5 h-5 ${isWishlisted ? "fill-crimson-600" : ""}`} />
+                </button>
 
-              <button
-                type="button"
-                onClick={handleShare}
-                className="p-3.5 rounded-xl border border-silk-300 text-silk-700 hover:bg-silk-950 hover:text-white hover:border-silk-950 transition dark:border-dark-border dark:text-silk-300 dark:hover:bg-gold-500 dark:hover:text-silk-950 dark:hover:border-gold-500"
-                aria-label="Share product"
-              >
-                <Share2 className="w-5 h-5" />
-              </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  className="flex-1 sm:flex-initial p-3.5 rounded-xl border border-silk-300 text-silk-700 hover:bg-silk-950 hover:text-white hover:border-silk-950 transition dark:border-dark-border dark:text-silk-300 dark:hover:bg-gold-500 dark:hover:text-silk-950 dark:hover:border-gold-500 flex items-center justify-center"
+                  aria-label="Share product"
+                >
+                  <Share2 className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
 

@@ -77,16 +77,16 @@ export const Header: React.FC = () => {
       {/* Top announcement bar */}
       <div className="bg-silk-950 text-silk-100 text-[11px] py-1.5 px-4 dark:bg-black dark:text-silk-200">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-gold-400" />
-            <span>
+          <div className="flex items-center gap-2 min-w-0">
+            <Sparkles className="w-3.5 h-3.5 text-gold-400 shrink-0" />
+            <span className="truncate">
               {language === "bn"
                 ? `৳${freeShippingThreshold.toLocaleString("bn-BD")} এর বেশি অর্ডারে সারা বাংলাদেশে ফ্রি ডেলিভারি!`
                 : `Free nationwide delivery on orders over ৳${freeShippingThreshold.toLocaleString("en-US")}!`}
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-4 text-silk-300">
+          <div className="hidden md:flex items-center gap-4 text-silk-300 shrink-0">
             <span className="flex items-center gap-1">
               <PhoneCall className="w-3 h-3 text-gold-400" />
               <span>{settings.phone || "০৯৬১২-SILKEN"}</span>
@@ -96,38 +96,38 @@ export const Header: React.FC = () => {
       </div>
 
       {/* Main navigation bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-20 gap-2 sm:gap-4">
           {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-silk-700 hover:text-silk-950 hover:bg-silk-100 dark:text-silk-300 dark:hover:text-white dark:hover:bg-dark-elevated transition"
+            className="md:hidden p-2 rounded-xl text-silk-700 hover:text-silk-950 hover:bg-silk-100 dark:text-silk-300 dark:hover:text-white dark:hover:bg-dark-elevated transition shrink-0"
             aria-label="Open navigation menu"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
           {/* Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 flex-shrink-0 group">
+          <Link to="/" className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0 group min-w-0">
             {settings.logoUrl && !logoError ? (
               <img
                 src={normalizeImageUrl(settings.logoUrl)}
                 alt={settings.storeName || t.common.brandName}
                 referrerPolicy="no-referrer"
                 onError={() => setLogoError(true)}
-                className="h-9 sm:h-11 w-auto max-w-[200px] object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-8 sm:h-11 w-auto max-w-[130px] sm:max-w-[200px] object-contain transition-transform group-hover:scale-[1.02]"
               />
             ) : (
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-gold-500 to-silk-900 flex items-center justify-center text-white shadow-soft">
-                  <span className="font-serif font-black text-xl italic tracking-tighter">S</span>
+              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-gold-500 to-silk-900 flex items-center justify-center text-white shadow-soft shrink-0">
+                  <span className="font-serif font-black text-lg sm:text-xl italic tracking-tighter">S</span>
                 </div>
-                <div>
-                  <span className="text-xl sm:text-2xl font-serif font-bold tracking-tight text-silk-950 dark:text-silk-50 group-hover:text-gold-600 transition">
+                <div className="min-w-0">
+                  <span className="text-lg sm:text-2xl font-serif font-bold tracking-tight text-silk-950 dark:text-silk-50 group-hover:text-gold-600 transition truncate block max-w-[120px] sm:max-w-none">
                     {settings.storeName || t.common.brandName}
                   </span>
-                  <span className="hidden sm:block text-[9px] uppercase tracking-widest text-gold-600 dark:text-gold-400 font-semibold">
+                  <span className="hidden sm:block text-[9px] uppercase tracking-widest text-gold-600 dark:text-gold-400 font-semibold truncate">
                     {language === "bn" ? settings.taglineBn || "Heritage Silk BD" : settings.taglineEn || "Heritage Silk BD"}
                   </span>
                 </div>
@@ -151,7 +151,7 @@ export const Header: React.FC = () => {
           </form>
 
           {/* Right Action Icons & Auth */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSwitcher />
             <ThemeSwitcher />
 

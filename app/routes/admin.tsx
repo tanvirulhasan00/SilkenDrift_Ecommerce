@@ -303,7 +303,7 @@ export default function AdminLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Navbar */}
-        <header className="sticky top-0 z-20 flex items-center justify-between h-16 px-4 sm:px-8 bg-white/90 backdrop-blur-md border-b border-silk-200 dark:bg-dark-surface/90 dark:border-dark-border">
+        <header className="sticky top-0 z-20 flex items-center justify-between h-16 px-3 sm:px-6 lg:px-8 bg-white/90 backdrop-blur-md border-b border-silk-200 dark:bg-dark-surface/90 dark:border-dark-border">
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -331,7 +331,7 @@ export default function AdminLayout() {
             )}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <LanguageSwitcher />
             <ThemeSwitcher />
 
@@ -392,7 +392,7 @@ export default function AdminLayout() {
         )}
 
         {/* Render nested module */}
-        <div className="flex-1 p-4 sm:p-8">
+        <div className="flex-1 p-3 sm:p-6 lg:p-8 min-w-0 overflow-x-hidden">
           <Outlet />
         </div>
       </div>

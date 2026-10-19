@@ -46,7 +46,7 @@ export const Modal: React.FC<ModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-silk-950/60 backdrop-blur-sm transition-opacity"
@@ -56,27 +56,27 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Dialog */}
       <div
         className={cn(
-          "relative w-full rounded-2xl bg-white p-6 shadow-2xl transition-all dark:bg-dark-surface dark:border dark:border-dark-border z-10",
+          "relative w-full my-auto max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-3rem)] flex flex-col rounded-2xl bg-white shadow-2xl transition-all dark:bg-dark-surface dark:border dark:border-dark-border z-10",
           maxWidthStyles[maxWidth],
           className
         )}
       >
-        <div className="flex items-center justify-between pb-3 border-b border-silk-100 dark:border-dark-border">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-silk-100 dark:border-dark-border shrink-0">
           {title ? (
-            <h3 className="text-lg font-semibold text-silk-900 dark:text-silk-50">
+            <h3 className="text-base sm:text-lg font-semibold text-silk-900 dark:text-silk-50 truncate pr-2">
               {title}
             </h3>
           ) : <div />}
           <button
             onClick={onClose}
-            className="rounded-lg p-1.5 text-silk-500 hover:bg-rose-50 hover:text-rose-600 dark:text-silk-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 transition"
+            className="rounded-lg p-1.5 text-silk-500 hover:bg-rose-50 hover:text-rose-600 dark:text-silk-400 dark:hover:bg-rose-950/40 dark:hover:text-rose-300 transition shrink-0"
             aria-label="Close modal"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="mt-4">{children}</div>
+        <div className="overflow-y-auto px-5 sm:px-6 py-4 flex-1">{children}</div>
       </div>
     </div>
   );

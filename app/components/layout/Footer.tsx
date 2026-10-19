@@ -237,10 +237,10 @@ export const Footer: React.FC = () => {
 
         {/* Payments Badges & Copyright */}
         <div className="mt-12 pt-8 border-t border-silk-900 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-silk-300 font-medium">
-          <p>{t.footer.copyright}</p>
+          <p className="text-center sm:text-left">{t.footer.copyright}</p>
 
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-silk-300 font-medium mr-2">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <span className="text-[11px] text-silk-300 font-medium mr-1">
               {language === "bn" ? "অনুমোদিত পেমেন্ট গেটওয়ে:" : "Payment Partners:"}
             </span>
             <span className="px-2 py-0.5 rounded bg-pink-900/40 text-pink-300 font-bold text-[10px] border border-pink-700/40">

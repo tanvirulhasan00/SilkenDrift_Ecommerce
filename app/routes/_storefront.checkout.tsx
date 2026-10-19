@@ -265,7 +265,7 @@ export default function CheckoutPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Form Steps Column */}
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-silk-200 shadow-card dark:bg-dark-surface dark:border-dark-border">
+        <div className="lg:col-span-7 bg-white p-4 sm:p-8 rounded-3xl border border-silk-200 shadow-card dark:bg-dark-surface dark:border-dark-border">
           {/* STEP 1: Customer Contact Info */}
           {checkout.currentStep === 1 && (
             <div className="space-y-6">
@@ -711,7 +711,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Order Summary Column (Sticky) */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-silk-200 shadow-card dark:bg-dark-surface dark:border-dark-border space-y-5 sticky top-28">
+        <div className="lg:col-span-5 bg-white p-4 sm:p-6 rounded-3xl border border-silk-200 shadow-card dark:bg-dark-surface dark:border-dark-border space-y-5 sticky top-28">
           <h3 className="font-serif font-bold text-lg text-silk-950 dark:text-silk-50 pb-3 border-b border-silk-100 dark:border-dark-border">
             {t.cart.cartSummary} ({cart.items.length})
           </h3>

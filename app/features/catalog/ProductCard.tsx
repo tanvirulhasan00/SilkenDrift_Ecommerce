@@ -212,7 +212,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </Link>
 
       {/* Card Content Details */}
-      <div className="flex flex-1 flex-col p-4 sm:p-5">
+      <div className="flex flex-1 flex-col p-3 sm:p-5">
         {/* Rating & Stock Indicator */}
         <div className="flex items-center justify-between text-xs text-silk-600 dark:text-silk-300 mb-1.5">
           <div className="flex items-center gap-1.5 bg-silk-100/80 dark:bg-dark-elevated px-2 py-0.5 rounded-full">
