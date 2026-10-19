@@ -15,7 +15,7 @@ import { Button } from "~/components/ui/Button";
 import { Link } from "react-router";
 import { useToast } from "~/components/feedback/ToastContext";
 import { useSettings } from "~/hooks/useSettings";
-import { normalizeImageUrl } from "~/lib/imageUrl";
+import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 
 export const CartDrawer: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -120,6 +120,17 @@ export const CartDrawer: React.FC = () => {
                     alt={language === "bn" ? item.productNameBn : item.productNameEn}
                     referrerPolicy="no-referrer"
                     className="h-20 w-20 rounded-lg object-cover border border-silk-200 dark:border-dark-border flex-shrink-0"
+                    onError={(e) => {
+                      if (item.image) {
+                        const fallbacks = getGoogleDriveFallbackUrls(item.image);
+                        const target = e.target as HTMLImageElement;
+                        const currentSrc = target.src;
+                        const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                        if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                          target.src = fallbacks[nextIdx];
+                        }
+                      }
+                    }}
                   />
                   <div className="flex-1 flex flex-col justify-between">
                     <div>

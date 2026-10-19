@@ -4,7 +4,7 @@ import { firestoreService } from "~/services/firebase/firestoreService";
 import { mockRepository } from "~/services/mock/mockStore";
 import { useLanguage } from "~/locales";
 import { formatPriceBDT } from "~/lib/formatters";
-import { normalizeImageUrl } from "~/lib/utils";
+import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/utils";
 import { useAppDispatch, useAppSelector } from "~/store";
 import { addToCart } from "~/store/slices/cartSlice";
 import { addRecentlyViewed, toggleWishlist } from "~/store/slices/uiSlice";
@@ -247,10 +247,23 @@ export default function ProductDetailPage() {
         <div className="lg:col-span-6 space-y-4">
           <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-silk-200/80 bg-white shadow-soft dark:border-dark-border dark:bg-dark-surface">
             <img
-              src={activeItem?.url || product.images[0]}
+              src={normalizeImageUrl(activeItem?.url || product.images[0])}
               alt={activeItem?.label || (language === "bn" ? product.nameBn : product.nameEn)}
               referrerPolicy="no-referrer"
               className="h-full w-full object-cover object-center transition-all duration-300"
+              onError={(e) => {
+                const rawUrl = activeItem?.url || product.images[0];
+                const fallbacks = getGoogleDriveFallbackUrls(rawUrl);
+                const target = e.target as HTMLImageElement;
+                const currentSrc = target.src;
+                const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                  target.src = fallbacks[nextIdx];
+                } else {
+                  target.src =
+                    "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80";
+                }
+              }}
             />
 
             {/* Discount Badge */}
@@ -305,10 +318,22 @@ export default function ProductDetailPage() {
                       title={item.label || `Photo ${idx + 1}`}
                     >
                       <img
-                        src={item.url}
+                        src={normalizeImageUrl(item.url)}
                         alt={`Thumbnail ${idx + 1}`}
                         referrerPolicy="no-referrer"
                         className="h-full w-full object-cover"
+                        onError={(e) => {
+                          const fallbacks = getGoogleDriveFallbackUrls(item.url);
+                          const target = e.target as HTMLImageElement;
+                          const currentSrc = target.src;
+                          const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                          if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                            target.src = fallbacks[nextIdx];
+                          } else {
+                            target.src =
+                              "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=60";
+                          }
+                        }}
                       />
                       {item.isVariantImage && item.color && (
                         <span className="absolute bottom-0.5 inset-x-0.5 px-1 text-[8px] font-bold truncate rounded bg-silk-950/85 text-gold-300 text-center">
@@ -403,10 +428,19 @@ export default function ProductDetailPage() {
                       {/* Mini variant image dot / thumbnail */}
                       {vImages[0] ? (
                         <img
-                          src={vImages[0]}
+                          src={normalizeImageUrl(vImages[0])}
                           alt={v.titleEn}
                           referrerPolicy="no-referrer"
                           className="w-5 h-5 rounded-full object-cover border border-silk-300 dark:border-dark-border"
+                          onError={(e) => {
+                            const fallbacks = getGoogleDriveFallbackUrls(vImages[0]);
+                            const target = e.target as HTMLImageElement;
+                            const currentSrc = target.src;
+                            const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                            if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                              target.src = fallbacks[nextIdx];
+                            }
+                          }}
                         />
                       ) : (
                         <span className="w-2.5 h-2.5 rounded-full bg-gold-500 inline-block" />

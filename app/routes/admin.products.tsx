@@ -9,6 +9,8 @@ import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
 import { Input } from "~/components/ui/Input";
+import { ImageUploadInput } from "~/components/ui/ImageUploadInput";
+import { normalizeImageUrl } from "~/lib/imageUrl";
 import { useToast } from "~/components/feedback/ToastContext";
 import { Product, Category, Brand } from "~/types";
 import {
@@ -113,7 +115,7 @@ export default function AdminProductsPage() {
       slug,
       descriptionEn: catDescEn,
       descriptionBn: catDescBn,
-      imageUrl: catImageUrl,
+      imageUrl: normalizeImageUrl(catImageUrl.trim()),
       sortOrder: Number(catSortOrder),
       isActive: catIsActive,
       featuredOnHome: catFeaturedOnHome,
@@ -278,9 +280,14 @@ export default function AdminProductsPage() {
                           <div className="flex items-center gap-3">
                             <div className="relative shrink-0">
                               <img
-                                src={p.images[0]}
+                                src={normalizeImageUrl(p.images[0])}
                                 alt={p.nameEn}
+                                referrerPolicy="no-referrer"
                                 className="w-12 h-12 rounded-lg object-cover border border-silk-200 dark:border-dark-border"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src =
+                                    "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=100&q=60";
+                                }}
                               />
                               {p.images.length > 1 && (
                                 <span
@@ -405,9 +412,14 @@ export default function AdminProductsPage() {
                       <div className="flex items-center gap-2.5">
                         {c.imageUrl ? (
                           <img
-                            src={c.imageUrl}
+                            src={normalizeImageUrl(c.imageUrl)}
                             alt={c.nameEn}
+                            referrerPolicy="no-referrer"
                             className="w-10 h-10 rounded-xl object-cover border border-silk-200 dark:border-dark-border"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=100&q=60";
+                            }}
                           />
                         ) : (
                           <div className="w-10 h-10 rounded-xl bg-gold-100 text-gold-700 flex items-center justify-center font-bold">
@@ -512,11 +524,15 @@ export default function AdminProductsPage() {
             required
           />
 
-          <Input
-            label="Cover Image URL"
-            placeholder="https://images.unsplash.com/..."
+          <ImageUploadInput
+            label="Category Cover Image"
             value={catImageUrl}
-            onChange={(e) => setCatImageUrl(e.target.value)}
+            onChange={(url) => setCatImageUrl(url)}
+            placeholder="Paste Google Drive share link, image URL, or upload from device..."
+            helperText="Supports Google Drive share links ('Anyone with link'), web URLs, or device files"
+            previewShape="square"
+            previewHeight="h-20"
+            showDriveGuide={true}
           />
 
           <div className="grid grid-cols-2 gap-3">

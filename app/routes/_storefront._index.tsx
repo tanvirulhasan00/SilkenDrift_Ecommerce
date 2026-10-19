@@ -14,7 +14,7 @@ import {
   Star,
   Quote,
 } from "lucide-react";
-import { normalizeImageUrl } from "~/lib/imageUrl";
+import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 import { useToast } from "~/components/feedback/ToastContext";
 
 export async function clientLoader() {
@@ -131,6 +131,17 @@ export default function HomePage() {
                   alt={language === "bn" ? heroBanner?.titleBn : heroBanner?.titleEn}
                   referrerPolicy="no-referrer"
                   className="w-full aspect-[4/5] object-cover object-center"
+                  onError={(e) => {
+                    if (heroBanner?.imageUrl) {
+                      const fallbacks = getGoogleDriveFallbackUrls(heroBanner.imageUrl);
+                      const target = e.target as HTMLImageElement;
+                      const currentSrc = target.src;
+                      const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                      if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                        target.src = fallbacks[nextIdx];
+                      }
+                    }
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-silk-950/90 via-silk-950/30 to-transparent p-6 flex flex-col justify-end text-white">
                   <span className="text-xs uppercase font-bold text-gold-400 tracking-wider">
@@ -188,6 +199,17 @@ export default function HomePage() {
                 alt={language === "bn" ? cat.nameBn : cat.nameEn}
                 referrerPolicy="no-referrer"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                onError={(e) => {
+                  if (cat.imageUrl) {
+                    const fallbacks = getGoogleDriveFallbackUrls(cat.imageUrl);
+                    const target = e.target as HTMLImageElement;
+                    const currentSrc = target.src;
+                    const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                    if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                      target.src = fallbacks[nextIdx];
+                    }
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-silk-950/85 via-silk-950/20 to-transparent flex flex-col justify-end p-4 text-white">
                 <h4 className="text-xs sm:text-sm font-bold font-serif leading-tight">

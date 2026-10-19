@@ -69,27 +69,32 @@ export function normalizeImageUrl(rawUrl: string | undefined | null): string {
 }
 
 /**
- * Extracts the alphanumeric file ID from any Google Drive URL format.
+ * Extracts the alphanumeric file ID from any Google Drive URL format or raw ID string.
  */
 export function extractGoogleDriveId(rawUrl: string | undefined | null): string | null {
   if (!rawUrl || typeof rawUrl !== "string") return null;
   const url = rawUrl.trim();
 
-  // 1. /file/d/{FILE_ID}
-  const fileDMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]{20,})/);
+  // 1. /file/d/{FILE_ID} (e.g. drive.google.com/file/d/FILE_ID/view?usp=sharing)
+  const fileDMatch = url.match(/(?:\/|^)file\/d\/([a-zA-Z0-9_-]{15,})/);
   if (fileDMatch && fileDMatch[1]) return fileDMatch[1];
 
-  // 2. id={FILE_ID} in query parameters (open?id=, uc?id=, thumbnail?id=)
-  const queryIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]{20,})/);
+  // 2. id={FILE_ID} in query parameters (open?id=, uc?id=, thumbnail?id=, etc.)
+  const queryIdMatch = url.match(/[?&]id=([a-zA-Z0-9_-]{15,})/);
   if (queryIdMatch && queryIdMatch[1]) return queryIdMatch[1];
 
-  // 3. /d/{FILE_ID} (e.g. lh3.googleusercontent.com/d/{FILE_ID})
-  const dMatch = url.match(/\/d\/([a-zA-Z0-9_-]{20,})/);
+  // 3. /d/{FILE_ID} (e.g. lh3.googleusercontent.com/d/{FILE_ID} or drive.google.com/d/{FILE_ID})
+  const dMatch = url.match(/\/d\/([a-zA-Z0-9_-]{15,})/);
   if (dMatch && dMatch[1]) return dMatch[1];
 
   // 4. docs.google.com/.../d/{FILE_ID}
-  const docsMatch = url.match(/docs\.google\.com\/[^/]+\/d\/([a-zA-Z0-9_-]{20,})/);
+  const docsMatch = url.match(/docs\.google\.com\/[^/]+\/d\/([a-zA-Z0-9_-]{15,})/);
   if (docsMatch && docsMatch[1]) return docsMatch[1];
+
+  // 5. Raw Drive File ID if user pastes only the ID directly (typically 25-45 characters alphanumeric with - or _)
+  if (/^[a-zA-Z0-9_-]{25,45}$/.test(url)) {
+    return url;
+  }
 
   return null;
 }
@@ -98,9 +103,7 @@ export function extractGoogleDriveId(rawUrl: string | undefined | null): string 
  * Returns an array of progressive fallback direct URLs for a Google Drive asset.
  */
 export function getGoogleDriveFallbackUrls(urlOrId: string | undefined | null): string[] {
-  const id =
-    extractGoogleDriveId(urlOrId) ||
-    (urlOrId && /^[a-zA-Z0-9_-]{20,}$/.test(urlOrId.trim()) ? urlOrId.trim() : null);
+  const id = extractGoogleDriveId(urlOrId);
   if (!id) return [];
   return [
     `https://drive.google.com/thumbnail?id=${id}&sz=w1200`,

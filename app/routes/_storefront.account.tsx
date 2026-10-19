@@ -4,6 +4,7 @@ import { mockRepository } from "~/services/mock/mockStore";
 import { useLanguage } from "~/locales";
 import { useAuth } from "~/hooks/useAuth";
 import { formatPriceBDT, formatDate } from "~/lib/formatters";
+import { normalizeImageUrl } from "~/lib/imageUrl";
 import { ProductCard } from "~/features/catalog/ProductCard";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
@@ -244,9 +245,14 @@ export default function AccountPage() {
                     <div key={item.id} className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2.5">
                         <img
-                          src={item.image}
+                          src={normalizeImageUrl(item.image)}
                           alt={item.productNameEn}
+                          referrerPolicy="no-referrer"
                           className="w-10 h-10 rounded-lg object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src =
+                              "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=100&q=60";
+                          }}
                         />
                         <span className="font-semibold text-silk-900 dark:text-silk-100">
                           {language === "bn" ? item.productNameBn : item.productNameEn} (×{item.quantity})

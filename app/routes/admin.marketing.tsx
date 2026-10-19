@@ -10,7 +10,7 @@ import { Input } from "~/components/ui/Input";
 import { useToast } from "~/components/feedback/ToastContext";
 import { Coupon, Banner } from "~/types";
 import { ImageUploadInput } from "~/components/ui/ImageUploadInput";
-import { normalizeImageUrl } from "~/lib/imageUrl";
+import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 import {
   Tag,
   Plus,
@@ -155,7 +155,7 @@ export default function AdminMarketingPage() {
       titleBn: bannerTitleBn.trim() || bannerTitleEn.trim(),
       subtitleEn: bannerSubEn.trim(),
       subtitleBn: bannerSubEn.trim(),
-      imageUrl: bannerImage.trim(),
+      imageUrl: normalizeImageUrl(bannerImage.trim()),
       linkUrl: bannerLink.trim(),
       priority: Number(bannerPriority),
       isActive: true,
@@ -311,6 +311,15 @@ export default function AdminMarketingPage() {
                   alt={b.titleEn}
                   referrerPolicy="no-referrer"
                   className="w-full h-40 object-cover"
+                  onError={(e) => {
+                    const fallbacks = getGoogleDriveFallbackUrls(b.imageUrl);
+                    const target = e.target as HTMLImageElement;
+                    const currentSrc = target.src;
+                    const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                    if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                      target.src = fallbacks[nextIdx];
+                    }
+                  }}
                 />
                 <div className="p-4 space-y-1 text-xs">
                   <div className="flex justify-between items-center">

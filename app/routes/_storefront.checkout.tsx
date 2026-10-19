@@ -19,7 +19,7 @@ import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
 import { useToast } from "~/components/feedback/ToastContext";
 import { useSettings } from "~/hooks/useSettings";
-import { normalizeImageUrl } from "~/lib/imageUrl";
+import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 import { SEED_PICKUP_POINTS } from "~/services/mock/seedData";
 import { paymentAdapters } from "~/services/payments/adapters";
 import {
@@ -724,6 +724,17 @@ export default function CheckoutPage() {
                   alt={language === "bn" ? item.productNameBn : item.productNameEn}
                   referrerPolicy="no-referrer"
                   className="w-14 h-14 rounded-lg object-cover border border-silk-200 dark:border-dark-border flex-shrink-0"
+                  onError={(e) => {
+                    if (item.image) {
+                      const fallbacks = getGoogleDriveFallbackUrls(item.image);
+                      const target = e.target as HTMLImageElement;
+                      const currentSrc = target.src;
+                      const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                      if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                        target.src = fallbacks[nextIdx];
+                      }
+                    }
+                  }}
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-xs font-semibold text-silk-900 truncate dark:text-silk-100">

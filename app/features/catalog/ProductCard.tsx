@@ -8,7 +8,7 @@ import { addToCart } from "~/store/slices/cartSlice";
 import { toggleWishlist } from "~/store/slices/uiSlice";
 import { Heart, ShoppingBag, Star, Zap, Check, Eye } from "lucide-react";
 import { useToast } from "~/components/feedback/ToastContext";
-import { cn, normalizeImageUrl } from "~/lib/utils";
+import { cn, normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/utils";
 
 export interface ProductCardProps {
   product: Product;
@@ -103,6 +103,19 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             hoverImage !== primaryImage && "group-hover:opacity-0"
           )}
           loading="lazy"
+          onError={(e) => {
+            const rawFirst = product.images[0];
+            const fallbacks = getGoogleDriveFallbackUrls(rawFirst);
+            const target = e.target as HTMLImageElement;
+            const currentSrc = target.src;
+            const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+            if (nextIdx > 0 && nextIdx < fallbacks.length) {
+              target.src = fallbacks[nextIdx];
+            } else {
+              target.src =
+                "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=600&q=80";
+            }
+          }}
         />
 
         {/* Secondary Hover Image (if present) */}
@@ -113,6 +126,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             referrerPolicy="no-referrer"
             className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-all duration-700 group-hover:opacity-100 group-hover:scale-105"
             loading="lazy"
+            onError={(e) => {
+              const rawSecond = product.images[1];
+              const fallbacks = getGoogleDriveFallbackUrls(rawSecond);
+              const target = e.target as HTMLImageElement;
+              const currentSrc = target.src;
+              const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+              if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                target.src = fallbacks[nextIdx];
+              } else {
+                target.src = primaryImage;
+              }
+            }}
           />
         )}
 

@@ -5,6 +5,7 @@ import { mockRepository } from "~/services/mock/mockStore";
 import { getAdminPath } from "~/config/adminConfig";
 import { useLanguage } from "~/locales";
 import { formatPriceBDT, formatDate } from "~/lib/formatters";
+import { normalizeImageUrl } from "~/lib/imageUrl";
 import { Badge } from "~/components/ui/Badge";
 import { Button } from "~/components/ui/Button";
 import {
@@ -305,9 +306,14 @@ export default function AdminOverviewPage() {
             {topProducts.map((p) => (
               <div key={p.id} className="flex items-center gap-3 p-2 rounded-xl bg-silk-50 dark:bg-dark-elevated">
                 <img
-                  src={p.images[0]}
+                  src={normalizeImageUrl(p.images[0])}
                   alt={p.nameEn}
+                  referrerPolicy="no-referrer"
                   className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src =
+                      "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=100&q=60";
+                  }}
                 />
                 <div className="flex-1 min-w-0">
                   <h4 className="text-xs font-bold text-silk-900 truncate dark:text-silk-100">

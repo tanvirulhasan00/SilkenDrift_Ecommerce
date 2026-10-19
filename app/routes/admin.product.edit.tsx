@@ -32,7 +32,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
-import { normalizeImageUrl, readFileAsDataUrl, getImageProviderInfo } from "~/lib/imageUrl";
+import { normalizeImageUrl, readFileAsDataUrl, getImageProviderInfo, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 
 export async function clientLoader({ params }: { params: { id?: string } }) {
   const [categories, allProducts] = await Promise.all([
@@ -431,7 +431,7 @@ function ProductEditorForm({
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)+/g, "");
 
-      const validImages = prodImages.map((u) => u.trim()).filter(Boolean);
+      const validImages = prodImages.map((u) => normalizeImageUrl(u.trim())).filter(Boolean);
 
       if (validImages.length === 0) {
         validImages.push(
@@ -441,7 +441,8 @@ function ProductEditorForm({
 
       const assignedProductId = initialProduct ? initialProduct.id : `prod_${Date.now()}`;
       const syncedVariants = prodVariants.map((v, i) => {
-        const vImgs = v.images && v.images.length > 0 ? v.images : v.imageUrl ? [v.imageUrl] : [];
+        const rawVImgs = v.images && v.images.length > 0 ? v.images : v.imageUrl ? [v.imageUrl] : [];
+        const vImgs = rawVImgs.map((u) => normalizeImageUrl(u.trim())).filter(Boolean);
         return {
           ...v,
           productId: assignedProductId,
@@ -748,13 +749,21 @@ function ProductEditorForm({
                       {imgUrl.trim() ? (
                         <>
                           <img
-                            src={imgUrl}
+                            src={normalizeImageUrl(imgUrl)}
                             alt={`Product image ${index + 1}`}
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover object-center"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=60";
+                              const fallbacks = getGoogleDriveFallbackUrls(imgUrl);
+                              const target = e.target as HTMLImageElement;
+                              const currentSrc = target.src;
+                              const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                              if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                                target.src = fallbacks[nextIdx];
+                              } else {
+                                target.src =
+                                  "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=60";
+                              }
                             }}
                           />
                           {isHero && (
@@ -812,10 +821,10 @@ function ProductEditorForm({
                           />
                         </label>
                       </div>
-                      {imgUrl.includes("lh3.googleusercontent.com") && (
-                        <p className="text-[10px] text-emerald-600 font-medium flex items-center gap-1">
+                      {getImageProviderInfo(imgUrl).isGoogleDrive && (
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" />
-                          <span>Google Drive link converted to direct image stream</span>
+                          <span>Google Drive link detected &amp; converted to direct image stream</span>
                         </p>
                       )}
                     </div>
@@ -933,10 +942,19 @@ function ProductEditorForm({
                         <div className="relative shrink-0">
                           {vImages[0] ? (
                             <img
-                              src={vImages[0]}
+                              src={normalizeImageUrl(vImages[0])}
                               alt={v.titleEn}
                               referrerPolicy="no-referrer"
                               className="w-12 h-12 rounded-lg object-cover border border-silk-200 dark:border-dark-border"
+                              onError={(e) => {
+                                const fallbacks = getGoogleDriveFallbackUrls(vImages[0]);
+                                const target = e.target as HTMLImageElement;
+                                const currentSrc = target.src;
+                                const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                                if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                                  target.src = fallbacks[nextIdx];
+                                }
+                              }}
                             />
                           ) : (
                             <div className="w-12 h-12 rounded-lg bg-gold-50 text-gold-700 flex items-center justify-center font-bold text-xs border border-gold-200">
@@ -1165,13 +1183,21 @@ function ProductEditorForm({
                         <div className="w-10 h-10 rounded-lg overflow-hidden border border-silk-200 bg-silk-50 dark:border-dark-border dark:bg-dark-elevated shrink-0 flex items-center justify-center">
                           {vUrl.trim() ? (
                             <img
-                              src={vUrl}
+                              src={normalizeImageUrl(vUrl)}
                               alt={`Variant img ${vIdx + 1}`}
                               referrerPolicy="no-referrer"
                               className="w-full h-full object-cover"
                               onError={(e) => {
-                                (e.target as HTMLImageElement).src =
-                                  "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=60";
+                                const fallbacks = getGoogleDriveFallbackUrls(vUrl);
+                                const target = e.target as HTMLImageElement;
+                                const currentSrc = target.src;
+                                const nextIdx = fallbacks.indexOf(currentSrc) + 1;
+                                if (nextIdx > 0 && nextIdx < fallbacks.length) {
+                                  target.src = fallbacks[nextIdx];
+                                } else {
+                                  target.src =
+                                    "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=200&q=60";
+                                }
                               }}
                             />
                           ) : (
