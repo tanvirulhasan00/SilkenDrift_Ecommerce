@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useSearchParams } from "react-router";
 import { useAuth } from "~/hooks/useAuth";
 import { useLanguage } from "~/locales";
 import { Button } from "~/components/ui/Button";
@@ -33,6 +33,8 @@ export default function RegisterPage() {
   const { language, t } = useLanguage();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectUrl = searchParams.get("redirect") || "/account";
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -92,7 +94,7 @@ export default function RegisterPage() {
             : "Welcome to SilkenDrift! Your real customer account has been created.",
           "success"
         );
-        navigate("/account");
+        navigate(redirectUrl);
       } else {
         setErrorMessage(res.error || "Registration could not be completed.");
         showToast(res.error || "Registration error", "error");
@@ -235,7 +237,7 @@ export default function RegisterPage() {
             <div className="text-center pt-3 border-t border-silk-100 dark:border-dark-border text-xs text-silk-600 dark:text-silk-400">
               Already have an account?{" "}
               <Link
-                to="/login"
+                to={searchParams.get("redirect") ? `/login?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : "/login"}
                 className="font-bold text-gold-600 dark:text-gold-400 hover:underline"
               >
                 Sign In

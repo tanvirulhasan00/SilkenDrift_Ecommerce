@@ -861,6 +861,72 @@ class FirestoreService {
       };
     }
   }
+
+  // ==========================================
+  // WISHLIST (Database persistence)
+  // ==========================================
+
+  /**
+   * Fetch loved product slugs from database (Firestore or local mock repository)
+   */
+  async getWishlist(userId?: string): Promise<string[]> {
+    if (this.isDemoMode || !this.hasLiveFirestore || !userId) {
+      return mockRepository.getWishlist(userId);
+    }
+
+    try {
+      const docRef = doc(db, "wishlists", userId);
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const slugs = Array.isArray(data?.slugs) ? (data.slugs as string[]) : [];
+        mockRepository.saveWishlist(slugs, userId);
+        return slugs;
+      }
+
+      return mockRepository.getWishlist(userId);
+    } catch (err) {
+      console.warn("Firestore getWishlist fallback to local store:", err);
+      return mockRepository.getWishlist(userId);
+    }
+  }
+
+  /**
+   * Save loved product slugs to database (Firestore and local mock repository)
+   */
+  async saveWishlist(slugs: string[], userId?: string): Promise<void> {
+    mockRepository.saveWishlist(slugs, userId);
+
+    if (this.hasLiveFirestore && !this.isDemoMode && userId) {
+      try {
+        const docRef = doc(db, "wishlists", userId);
+        await setDoc(
+          docRef,
+          {
+            userId,
+            slugs,
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
+      } catch (err) {
+        console.error("Firestore saveWishlist error:", err);
+      }
+    }
+  }
+
+  /**
+   * Toggle a product slug in the wishlist in database
+   */
+  async toggleWishlist(slug: string, userId?: string): Promise<string[]> {
+    const current = await this.getWishlist(userId);
+    const updated = current.includes(slug)
+      ? current.filter((s) => s !== slug)
+      : [...current, slug];
+    await this.saveWishlist(updated, userId);
+    return updated;
+  }
 }
 
 export const firestoreService = new FirestoreService();

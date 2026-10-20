@@ -5,7 +5,7 @@ import { useLanguage } from "~/locales";
 import { formatPriceBDT } from "~/lib/formatters";
 import { useAppDispatch, useAppSelector } from "~/store";
 import { addToCart } from "~/store/slices/cartSlice";
-import { toggleWishlist } from "~/store/slices/uiSlice";
+import { useWishlist } from "~/hooks/useWishlist";
 import { Heart, ShoppingBag, Star, Zap, Check, Eye } from "lucide-react";
 import { useToast } from "~/components/feedback/ToastContext";
 import { cn, normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/utils";
@@ -18,11 +18,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { language, t } = useLanguage();
   const dispatch = useAppDispatch();
   const { showToast } = useToast();
+  const { isWishlisted: checkIsWishlisted, toggleWishlist: toggleDbWishlist } = useWishlist();
   const [justAdded, setJustAdded] = useState(false);
 
-  const isWishlisted = useAppSelector((state) =>
-    state.ui.wishlistSlugs.includes(product.slug)
-  );
+  const isWishlisted = checkIsWishlisted(product.slug);
 
   const primaryImage = normalizeImageUrl(
     product.images[0] ||
@@ -67,12 +66,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     );
   };
 
-  const handleToggleWishlist = (e: React.MouseEvent) => {
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    dispatch(toggleWishlist(product.slug));
+    const willBeSaved = await toggleDbWishlist(product.slug);
     showToast(
-      isWishlisted
+      !willBeSaved
         ? language === "bn"
           ? "উইশলিস্ট থেকে সরানো হয়েছে"
           : "Removed from Wishlist"

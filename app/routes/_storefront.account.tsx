@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useLoaderData, useSearchParams, Link } from "react-router";
+import { firestoreService } from "~/services/firebase/firestoreService";
 import { mockRepository } from "~/services/mock/mockStore";
 import { useLanguage } from "~/locales";
 import { useAuth } from "~/hooks/useAuth";
+import { useWishlist } from "~/hooks/useWishlist";
 import { formatPriceBDT, formatDate } from "~/lib/formatters";
 import { normalizeImageUrl } from "~/lib/imageUrl";
 import { ProductCard } from "~/features/catalog/ProductCard";
@@ -19,19 +21,37 @@ import {
   ExternalLink,
   MessageSquare,
   CheckCircle,
+  Trash2,
+  ShoppingBag,
 } from "lucide-react";
 
 export async function clientLoader() {
-  const orders = mockRepository.getOrders();
-  const products = mockRepository.getProducts();
-  const supportTickets = mockRepository.getSupportTickets();
-  return { orders, products, supportTickets };
+  try {
+    const [orders, products] = await Promise.all([
+      firestoreService.getOrders(),
+      firestoreService.getProducts(),
+    ]);
+    const supportTickets = mockRepository.getSupportTickets();
+    return { orders: orders || [], products: products || [], supportTickets };
+  } catch {
+    return {
+      orders: mockRepository.getOrders(),
+      products: mockRepository.getProducts(),
+      supportTickets: mockRepository.getSupportTickets(),
+    };
+  }
 }
 
 export default function AccountPage() {
   const { orders, products, supportTickets } = useLoaderData<typeof clientLoader>();
   const { language, t } = useLanguage();
   const { user, logout } = useAuth();
+  const { wishlistSlugs, clearWishlist } = useWishlist();
+
+  // Show ONLY products the user has loved / wishlisted
+  const lovedProducts = products.filter(
+    (p) => wishlistSlugs.includes(p.slug) || wishlistSlugs.includes(p.id)
+  );
   const { showToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -64,28 +84,56 @@ export default function AccountPage() {
   const selectedTicket = supportTickets.find((t) => t.id === selectedTicketId);
 
   if (!user) {
+    const isTrackTab = activeTab === "track";
+    const currentRedirect = isTrackTab ? "/account?tab=track" : "/account";
+
     return (
       <div className="max-w-md mx-auto px-4 py-20 text-center space-y-6">
         <div className="w-16 h-16 rounded-full bg-gold-500/20 text-gold-600 flex items-center justify-center mx-auto border border-gold-400">
-          <User className="w-8 h-8" />
+          {isTrackTab ? <Package className="w-8 h-8" /> : <User className="w-8 h-8" />}
         </div>
         <div className="space-y-2">
+          {isTrackTab && (
+            <span className="inline-block px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gold-100 text-gold-900 border border-gold-300 dark:bg-gold-950/40 dark:text-gold-300 dark:border-gold-800">
+              {language === "bn" ? "শুধুমাত্র নিবন্ধিত গ্রাহকদের জন্য" : "Registered Members Only"}
+            </span>
+          )}
           <h2 className="text-2xl font-serif font-bold text-silk-950 dark:text-silk-50">
-            Sign In to View Your Account
+            {isTrackTab
+              ? language === "bn"
+                ? "অর্ডার ট্র্যাক করতে লগইন বা নিবন্ধন করুন"
+                : "Order Tracker Requires Account Access"
+              : language === "bn"
+              ? "অ্যাকাউন্ট দেখতে সাইন ইন করুন"
+              : "Sign In to View Your Account"}
           </h2>
-          <p className="text-xs text-silk-600 dark:text-silk-400">
-            Access your real-time order tracking, purchase history, saved wishlist, and customer rewards.
+          <p className="text-xs text-silk-600 dark:text-silk-400 leading-relaxed">
+            {isTrackTab
+              ? language === "bn"
+                ? "আপনার ডেলিভারি ঠিকানা এবং কুরিয়ার লাইভ ট্র্যাকিং তথ্যের সুরক্ষার জন্য অর্ডার ট্র্যাকার শুধুমাত্র নিবন্ধিত গ্রাহকদের জন্য উন্মুক্ত।"
+                : "To protect your personal delivery address, phone number, and real-time courier updates, the Order Tracker is exclusively accessible for registered SilkenDrift members."
+              : "Access your real-time order tracking, purchase history, saved wishlist, and customer rewards."}
           </p>
         </div>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
-          <Link to="/login?redirect=/account" className="w-full sm:w-auto">
+          <Link
+            to={`/login?redirect=${encodeURIComponent(currentRedirect)}`}
+            className="w-full sm:w-auto"
+          >
             <Button variant="primary" className="w-full">
-              Sign In
+              {isTrackTab
+                ? language === "bn"
+                  ? "সাইন ইন করে ট্র্যাক করুন"
+                  : "Sign In to Track Order"
+                : "Sign In"}
             </Button>
           </Link>
-          <Link to="/register" className="w-full sm:w-auto">
+          <Link
+            to={`/register?redirect=${encodeURIComponent(currentRedirect)}`}
+            className="w-full sm:w-auto"
+          >
             <Button variant="outline" className="w-full">
-              Register New Account
+              {language === "bn" ? "নতুন অ্যাকাউন্ট খুলুন" : "Register New Account"}
             </Button>
           </Link>
         </div>
@@ -156,6 +204,11 @@ export default function AccountPage() {
         >
           <Heart className="w-4 h-4 text-crimson-600 dark:text-crimson-400" />
           <span>{t.nav.wishlist}</span>
+          {lovedProducts.length > 0 && (
+            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-crimson-500 text-white">
+              {lovedProducts.length}
+            </span>
+          )}
         </button>
 
         <button
@@ -279,17 +332,76 @@ export default function AccountPage() {
         </div>
       )}
 
-      {/* Wishlist Tab */}
+      {/* Wishlist Tab - ONLY Shows Loved Products */}
       {activeTab === "wishlist" && (
         <div className="space-y-6">
-          <h2 className="text-lg font-serif font-bold text-silk-950 dark:text-silk-50">
-            {t.nav.wishlist}
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {products.slice(0, 4).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-silk-100 dark:border-dark-border">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <h2 className="text-xl font-serif font-bold text-silk-950 dark:text-silk-50">
+                  {t.nav.wishlist}
+                </h2>
+                <span className="text-xs font-mono font-bold px-2.5 py-0.5 rounded-full bg-crimson-100 text-crimson-800 dark:bg-crimson-950 dark:text-crimson-300">
+                  {lovedProducts.length} {language === "bn" ? "টি সংরক্ষিত" : "saved"}
+                </span>
+              </div>
+              <p className="text-xs text-silk-500 mt-1">
+                {language === "bn"
+                  ? "আপনার সমস্ত পছন্দের সিল্ক শাড়ি, পাঞ্জাবি ও জামদানি এখানে ডাটাবেসে সংরক্ষিত রয়েছে।"
+                  : "All your loved handloom sarees, panjabis, and fabrics saved in your account."}
+              </p>
+            </div>
+
+            {lovedProducts.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={async () => {
+                  await clearWishlist();
+                  showToast(
+                    language === "bn"
+                      ? "উইশলিস্ট খালি করা হয়েছে"
+                      : "Wishlist has been cleared",
+                    "info"
+                  );
+                }}
+                className="text-xs text-rose-600 hover:text-white hover:bg-rose-600 hover:border-rose-600 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white transition"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                <span>{language === "bn" ? "উইশলিস্ট খালি করুন" : "Clear Wishlist"}</span>
+              </Button>
+            )}
           </div>
+
+          {lovedProducts.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {lovedProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 bg-white dark:bg-dark-surface rounded-3xl border border-silk-200 dark:border-dark-border p-8 space-y-4 shadow-soft">
+              <div className="w-16 h-16 rounded-full bg-crimson-50 text-crimson-600 dark:bg-crimson-950/40 dark:text-crimson-400 flex items-center justify-center mx-auto border border-crimson-200 dark:border-crimson-800 shadow-soft">
+                <Heart className="w-8 h-8" />
+              </div>
+              <div className="space-y-1.5 max-w-md mx-auto">
+                <h3 className="text-xl font-serif font-bold text-silk-950 dark:text-silk-50">
+                  {language === "bn" ? "আপনার উইশলিস্ট খালি" : "Your Wishlist is Empty"}
+                </h3>
+                <p className="text-xs text-silk-600 dark:text-silk-400 leading-relaxed">
+                  {language === "bn"
+                    ? "আপনি এখনও কোনো পণ্য পছন্দ করে রাখেননি। শপ থেকে আপনার পছন্দের সিল্ক শাড়ি, জামদানি বা পাঞ্জাবির ওপর হার্ট (❤️) আইকনে ক্লিক করুন।"
+                    : "You haven't saved any handloom treasures yet. Explore our genuine Rajshahi silk sarees, Jamdani, and panjabis and tap the heart (❤️) icon to save them here."}
+                </p>
+              </div>
+              <Link to="/shop" className="inline-block pt-2">
+                <Button variant="gold" size="sm">
+                  <ShoppingBag className="w-4 h-4 mr-1.5" />
+                  <span>{language === "bn" ? "শপ ব্রাউজ করুন" : "Explore Handloom Catalog"}</span>
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

@@ -178,8 +178,13 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2 text-xs text-silk-400">
               <li>
-                <Link to="/account?tab=track" className="hover:text-gold-400 transition">
+                <Link to="/track" className="hover:text-gold-400 transition">
                   {t.nav.trackOrder}
+                </Link>
+              </li>
+              <li>
+                <Link to="/wishlist" className="hover:text-gold-400 transition">
+                  {t.nav.wishlist}
                 </Link>
               </li>
               <li>

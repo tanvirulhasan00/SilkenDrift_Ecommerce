@@ -7,7 +7,8 @@ import { formatPriceBDT } from "~/lib/formatters";
 import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/utils";
 import { useAppDispatch, useAppSelector } from "~/store";
 import { addToCart } from "~/store/slices/cartSlice";
-import { addRecentlyViewed, toggleWishlist } from "~/store/slices/uiSlice";
+import { addRecentlyViewed } from "~/store/slices/uiSlice";
+import { useWishlist } from "~/hooks/useWishlist";
 import { Button } from "~/components/ui/Button";
 import { useToast } from "~/components/feedback/ToastContext";
 import { ProductCard } from "~/features/catalog/ProductCard";
@@ -53,9 +54,8 @@ export default function ProductDetailPage() {
   const recentlyViewedSlugs = useAppSelector(
     (state) => state.ui.recentlyViewedSlugs
   );
-  const isWishlisted = useAppSelector((state) =>
-    state.ui.wishlistSlugs.includes(product.slug)
-  );
+  const { isWishlisted: checkIsWishlisted, toggleWishlist: toggleDbWishlist } = useWishlist();
+  const isWishlisted = checkIsWishlisted(product.slug);
 
   // Find default variant: check isDefault first, fallback to first variant
   const defaultVariant =
@@ -534,7 +534,19 @@ export default function ProductDetailPage() {
               <div className="flex gap-3 sm:contents">
                 <button
                   type="button"
-                  onClick={() => dispatch(toggleWishlist(product.slug))}
+                  onClick={async () => {
+                    const willBeSaved = await toggleDbWishlist(product.slug);
+                    showToast(
+                      !willBeSaved
+                        ? language === "bn"
+                          ? "উইশলিস্ট থেকে সরানো হয়েছে"
+                          : "Removed from Wishlist"
+                        : language === "bn"
+                        ? "উইশলিস্টে যুক্ত করা হয়েছে ❤️"
+                        : `${t.product.addedToWishlist} ❤️`,
+                      "info"
+                    );
+                  }}
                   className={`flex-1 sm:flex-initial p-3.5 rounded-xl border transition flex items-center justify-center ${
                     isWishlisted
                       ? "bg-crimson-50 border-crimson-300 text-crimson-600 hover:bg-crimson-600 hover:text-white hover:border-crimson-600 dark:bg-crimson-950/40 dark:border-crimson-800 dark:hover:bg-crimson-600 dark:hover:text-white"

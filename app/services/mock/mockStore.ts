@@ -586,6 +586,42 @@ class MockDataRepository {
   }
 
   // ==========================================
+  // WISHLIST PERSISTENCE
+  // ==========================================
+  getWishlist(userId?: string): string[] {
+    if (typeof window === "undefined") return [];
+    try {
+      const key = userId ? `sd_mock_wishlist_${userId}` : "sd_mock_wishlist";
+      const raw = localStorage.getItem(key);
+      if (raw) return JSON.parse(raw);
+      const fallback = localStorage.getItem("silkendrift_wishlist") || localStorage.getItem("sd_mock_wishlist");
+      return fallback ? JSON.parse(fallback) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  saveWishlist(slugs: string[], userId?: string): void {
+    if (typeof window === "undefined") return;
+    try {
+      const key = userId ? `sd_mock_wishlist_${userId}` : "sd_mock_wishlist";
+      localStorage.setItem(key, JSON.stringify(slugs));
+      localStorage.setItem("silkendrift_wishlist", JSON.stringify(slugs));
+    } catch (e) {
+      console.warn("Could not save wishlist to mock store:", e);
+    }
+  }
+
+  toggleWishlist(slug: string, userId?: string): string[] {
+    const current = this.getWishlist(userId);
+    const updated = current.includes(slug)
+      ? current.filter((s) => s !== slug)
+      : [...current, slug];
+    this.saveWishlist(updated, userId);
+    return updated;
+  }
+
+  // ==========================================
   // SETTINGS & SYSTEM RESET
   // ==========================================
   getSettings(): BusinessSettings {

@@ -7,6 +7,7 @@ import { openCartDrawer } from "~/store/slices/cartSlice";
 import { LanguageSwitcher } from "~/components/common/LanguageSwitcher";
 import { ThemeSwitcher } from "~/components/common/ThemeSwitcher";
 import { useSettings } from "~/hooks/useSettings";
+import { useWishlist } from "~/hooks/useWishlist";
 import { normalizeImageUrl } from "~/lib/imageUrl";
 import { getAdminPath } from "~/config/adminConfig";
 import {
@@ -24,6 +25,7 @@ import {
   LogOut,
   ChevronDown,
   Package,
+  Truck,
 } from "lucide-react";
 
 export const Header: React.FC = () => {
@@ -41,7 +43,7 @@ export const Header: React.FC = () => {
   const cartItemsCount = useAppSelector((state) =>
     state.cart.items.reduce((acc, i) => acc + i.quantity, 0)
   );
-  const wishlistCount = useAppSelector((state) => state.ui.wishlistSlugs.length);
+  const { wishlistCount } = useWishlist();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -230,6 +232,31 @@ export const Header: React.FC = () => {
                         <span>My Orders</span>
                       </Link>
 
+                      <Link
+                        to="/track"
+                        onClick={() => setIsAccountMenuOpen(false)}
+                        className="flex items-center gap-2 px-4 py-2 hover:bg-silk-50 dark:hover:bg-dark-elevated text-silk-700 dark:text-silk-300 transition"
+                      >
+                        <Truck className="w-3.5 h-3.5 text-gold-500" />
+                        <span>Track Order</span>
+                      </Link>
+
+                      <Link
+                        to="/wishlist"
+                        onClick={() => setIsAccountMenuOpen(false)}
+                        className="flex items-center justify-between px-4 py-2 hover:bg-silk-50 dark:hover:bg-dark-elevated text-silk-700 dark:text-silk-300 transition"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Heart className="w-3.5 h-3.5 text-crimson-500" />
+                          <span>My Wishlist</span>
+                        </div>
+                        {wishlistCount > 0 && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-crimson-100 text-crimson-800 dark:bg-crimson-950 dark:text-crimson-300">
+                            {wishlistCount}
+                          </span>
+                        )}
+                      </Link>
+
                       {/* Discreet HQ Staff Portal link - ONLY visible when authenticated as staff */}
                       {isManager && (
                         <Link
@@ -264,7 +291,7 @@ export const Header: React.FC = () => {
 
             {/* Wishlist Link */}
             <Link
-              to="/account?tab=wishlist"
+              to="/wishlist"
               className="relative p-2 rounded-xl text-silk-700 hover:text-crimson-600 hover:bg-crimson-50 dark:text-silk-300 dark:hover:text-crimson-400 dark:hover:bg-dark-elevated transition"
               aria-label="Wishlist"
             >
@@ -321,7 +348,7 @@ export const Header: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4 text-[11px] font-medium text-silk-700 dark:text-silk-300">
-            <Link to="/account?tab=track" className="hover:text-silk-950 dark:hover:text-white transition">
+            <Link to="/track" className="hover:text-silk-950 dark:hover:text-white transition">
               {t.nav.trackOrder}
             </Link>
             <Link to="/static/about" className="hover:text-silk-950 dark:hover:text-white transition">
@@ -430,7 +457,7 @@ export const Header: React.FC = () => {
               My Account
             </Link>
             <Link
-              to="/account?tab=track"
+              to="/track"
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-2 rounded-lg hover:bg-silk-50 dark:hover:bg-dark-elevated"
             >

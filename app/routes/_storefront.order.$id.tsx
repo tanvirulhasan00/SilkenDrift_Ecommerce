@@ -2,6 +2,7 @@ import React from "react";
 import { useLoaderData, Link } from "react-router";
 import { firestoreService } from "~/services/firebase/firestoreService";
 import { useLanguage } from "~/locales";
+import { useAuth } from "~/hooks/useAuth";
 import { formatPriceBDT, formatDate } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
@@ -14,6 +15,7 @@ import {
   Calendar,
   CreditCard,
   ArrowLeft,
+  ShieldCheck,
 } from "lucide-react";
 
 export async function clientLoader({ params }: { params: { id: string } }) {
@@ -27,6 +29,7 @@ export async function clientLoader({ params }: { params: { id: string } }) {
 export default function OrderSuccessPage() {
   const { order } = useLoaderData<typeof clientLoader>();
   const { language, t } = useLanguage();
+  const { user } = useAuth();
 
   const handlePrint = () => {
     window.print();
@@ -51,6 +54,13 @@ export default function OrderSuccessPage() {
             <Printer className="w-4 h-4 mr-1" />
             <span>{t.orderSuccess.printInvoice}</span>
           </Button>
+
+          <Link to={`/track?order=${order.orderNumber}`}>
+            <Button variant="gold" size="sm">
+              <Truck className="w-4 h-4 mr-1" />
+              <span>{t.nav.trackOrder}</span>
+            </Button>
+          </Link>
 
           <Link to="/">
             <Button variant="primary" size="sm">
@@ -228,6 +238,31 @@ export default function OrderSuccessPage() {
               </div>
             ))}
           </div>
+
+          {!user && (
+            <div className="mt-4 p-4 rounded-2xl bg-gold-50/70 border border-gold-300 dark:bg-gold-950/20 dark:border-gold-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div className="flex items-start gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-gold-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-silk-900 dark:text-silk-100">
+                    {language === "bn"
+                      ? "লাইভ কুরিয়ার ট্র্যাকিং ও এসএমএস নোটিফিকেশন"
+                      : "Live Courier Tracking & SMS Alerts"}
+                  </p>
+                  <p className="text-[11px] text-silk-600 dark:text-silk-400">
+                    {language === "bn"
+                      ? "রিয়েল-টাইম কুরিয়ার মুভমেন্ট দেখতে এবং অর্ডার ট্র্যাক করতে একটি ফ্রি অ্যাকাউন্ট খুলুন।"
+                      : "Create a free account with your checkout mobile number to unlock live order tracking and dispatch alerts."}
+                  </p>
+                </div>
+              </div>
+              <Link to={`/register?redirect=${encodeURIComponent(`/track?order=${order.orderNumber}`)}`}>
+                <Button variant="gold" size="sm" className="shrink-0">
+                  <span>{language === "bn" ? "অ্যাকাউন্ট খুলুন" : "Register to Track"}</span>
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

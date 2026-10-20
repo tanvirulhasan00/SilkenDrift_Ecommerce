@@ -70,6 +70,24 @@ export const uiSlice = createSlice({
         localStorage.setItem(WISHLIST_KEY, JSON.stringify(state.wishlistSlugs));
       }
     },
+    setWishlistSlugs: (state, action: PayloadAction<string[]>) => {
+      state.wishlistSlugs = action.payload;
+      if (typeof window !== "undefined") {
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(state.wishlistSlugs));
+      }
+    },
+    removeFromWishlist: (state, action: PayloadAction<string>) => {
+      state.wishlistSlugs = state.wishlistSlugs.filter((s) => s !== action.payload);
+      if (typeof window !== "undefined") {
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify(state.wishlistSlugs));
+      }
+    },
+    clearWishlist: (state) => {
+      state.wishlistSlugs = [];
+      if (typeof window !== "undefined") {
+        localStorage.setItem(WISHLIST_KEY, JSON.stringify([]));
+      }
+    },
     setMobileMenuOpen: (state, action: PayloadAction<boolean>) => {
       state.isMobileMenuOpen = action.payload;
     },
@@ -82,6 +100,9 @@ export const uiSlice = createSlice({
 export const {
   addRecentlyViewed,
   toggleWishlist,
+  setWishlistSlugs,
+  removeFromWishlist,
+  clearWishlist,
   setMobileMenuOpen,
   setFilterDrawerOpen,
 } = uiSlice.actions;

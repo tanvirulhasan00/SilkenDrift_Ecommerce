@@ -139,7 +139,7 @@ export default function LoginPage() {
             <div className="text-center pt-3 border-t border-silk-100 dark:border-dark-border text-xs text-silk-600 dark:text-silk-400">
               Don&apos;t have an account?{" "}
               <Link
-                to="/register"
+                to={searchParams.get("redirect") ? `/register?redirect=${encodeURIComponent(searchParams.get("redirect")!)}` : "/register"}
                 className="font-bold text-gold-600 dark:text-gold-400 hover:underline"
               >
                 Register here
