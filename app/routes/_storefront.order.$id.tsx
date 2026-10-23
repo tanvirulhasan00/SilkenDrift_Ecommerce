@@ -19,7 +19,8 @@ import {
 } from "lucide-react";
 
 export async function clientLoader({ params }: { params: { id: string } }) {
-  const order = await firestoreService.getOrderById(params.id);
+  const orderId = decodeURIComponent(params.id || "").trim();
+  const order = await firestoreService.getOrderById(orderId);
   if (!order) {
     throw new Response("Order Not Found", { status: 404 });
   }
@@ -264,6 +265,38 @@ export default function OrderSuccessPage() {
             </div>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function ErrorBoundary() {
+  const { language, t } = useLanguage();
+  return (
+    <div className="max-w-xl mx-auto px-4 py-20 text-center space-y-4">
+      <div className="w-16 h-16 rounded-full bg-silk-100 flex items-center justify-center mx-auto text-gold-600 dark:bg-dark-elevated">
+        <Package className="w-8 h-8" />
+      </div>
+      <h2 className="text-xl font-serif font-bold text-silk-950 dark:text-silk-50">
+        {language === "bn" ? "অর্ডার খুঁজে পাওয়া যায়নি" : "Order Not Found"}
+      </h2>
+      <p className="text-xs text-silk-600 dark:text-silk-400 max-w-sm mx-auto">
+        {language === "bn"
+          ? "দুঃখিত, এই অর্ডারের তথ্য পাওয়া যায়নি। অনুগ্রহ করে আপনার অর্ডার নম্বর দিয়ে ট্র্যাক করুন।"
+          : "We could not find the requested order. You can track using your order number or continue shopping."}
+      </p>
+      <div className="flex items-center justify-center gap-3 pt-4">
+        <Link to="/track">
+          <Button variant="gold" size="sm">
+            <Truck className="w-4 h-4 mr-1.5" />
+            <span>{t.nav.trackOrder}</span>
+          </Button>
+        </Link>
+        <Link to="/shop">
+          <Button variant="outline" size="sm">
+            <span>{t.cart.continueShopping}</span>
+          </Button>
+        </Link>
       </div>
     </div>
   );

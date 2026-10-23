@@ -8,7 +8,10 @@ export default [
     route("shop", "routes/_storefront.shop.tsx"),
     route("product/:slug", "routes/_storefront.product.$slug.tsx"),
     route("checkout", "routes/_storefront.checkout.tsx"),
-    route("order/success/:id", "routes/_storefront.order.$id.tsx"),
+    route("order/success/:id", "routes/_storefront.order.$id.tsx", {
+      id: "routes/_storefront.order.success.$id",
+    }),
+    route("order/:id", "routes/_storefront.order.$id.tsx"),
     route("account", "routes/_storefront.account.tsx"),
     route("wishlist", "routes/_storefront.wishlist.tsx"),
     route("track", "routes/_storefront.track.tsx"),

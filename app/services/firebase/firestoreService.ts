@@ -333,33 +333,13 @@ class FirestoreService {
   async createOrder(
     orderData: Omit<Order, "id" | "orderNumber" | "createdAt" | "updatedAt" | "timeline">
   ): Promise<Order> {
-    const orderNumber = generateOrderNumber();
-    const id = `ord_${generateId()}`;
-    const now = new Date().toISOString();
-
-    const newOrder: Order = {
-      ...orderData,
-      id,
-      orderNumber,
-      createdAt: now,
-      updatedAt: now,
-      timeline: [
-        {
-          status: "pending",
-          labelEn: "Order submitted by customer",
-          labelBn: "গ্রাহক কর্তৃক অর্ডার দাখিল করা হয়েছে",
-          timestamp: now,
-        },
-      ],
-    };
-
-    // Save to local store for instant reactive UI
-    mockRepository.createOrder(orderData);
+    // Save to local store for instant reactive UI & inventory deduction
+    const newOrder = mockRepository.createOrder(orderData);
 
     // Save to Firestore only in real user mode
     if (this.hasLiveFirestore && !this.isDemoMode) {
       try {
-        const orderRef = doc(db, "orders", id);
+        const orderRef = doc(db, "orders", newOrder.id);
         await setDoc(orderRef, newOrder);
       } catch (err) {
         console.error("Firestore createOrder error (order saved locally):", err);
@@ -383,7 +363,9 @@ class FirestoreService {
       const docSnap = await getDoc(docRef);
 
       if (docSnap.exists()) {
-        return { id: docSnap.id, ...docSnap.data() } as Order;
+        const order = { id: docSnap.id, ...docSnap.data() } as Order;
+        mockRepository.saveOrder(order);
+        return order;
       }
 
       // 2. Query by orderNumber
@@ -392,7 +374,9 @@ class FirestoreService {
 
       if (!querySnap.empty) {
         const item = querySnap.docs[0];
-        return { id: item.id, ...item.data() } as Order;
+        const order = { id: item.id, ...item.data() } as Order;
+        mockRepository.saveOrder(order);
+        return order;
       }
 
       // 3. Fallback to local

@@ -127,6 +127,7 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
+    if (isSubmitting) return;
     if (cart.items.length === 0) {
       showToast(t.cart.emptyCartTitle, "error");
       return;
@@ -183,14 +184,17 @@ export default function CheckoutPage() {
       const createdOrder = await firestoreService.createOrder(orderData);
 
       // Trigger payment initiation
-      await adapter.initiatePayment(createdOrder);
+      const paymentRes = await adapter.initiatePayment(createdOrder);
+      if (paymentRes && !paymentRes.success) {
+        throw new Error(paymentRes.error || "Payment initiation failed");
+      }
+
+      showToast(t.orderSuccess.title, "success");
+      navigate(`/order/success/${createdOrder.id}`);
 
       // Clear draft & cart
       dispatch(clearCart());
       dispatch(resetCheckoutDraft());
-
-      showToast(t.orderSuccess.title, "success");
-      navigate(`/order/success/${createdOrder.id}`);
     } catch (err) {
       showToast(err instanceof Error ? err.message : "Failed to place order", "error");
     } finally {
@@ -198,7 +202,7 @@ export default function CheckoutPage() {
     }
   };
 
-  if (cart.items.length === 0) {
+  if (cart.items.length === 0 && !isSubmitting) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-20 text-center">
         <div className="w-16 h-16 rounded-full bg-silk-100 flex items-center justify-center mx-auto mb-4 text-silk-700 dark:bg-dark-elevated dark:text-silk-300">

@@ -272,28 +272,58 @@ class MockDataRepository {
   }
 
   getOrderById(id: string): Order | undefined {
-    return this.orders.find((o) => o.id === id || o.orderNumber === id);
+    let order = this.orders.find((o) => o.id === id || o.orderNumber === id);
+    if (!order && typeof window !== "undefined") {
+      try {
+        const o = localStorage.getItem("sd_mock_orders");
+        if (o) {
+          const storedOrders: Order[] = JSON.parse(o);
+          order = storedOrders.find((ord) => ord.id === id || ord.orderNumber === id);
+          if (order) {
+            this.orders = storedOrders;
+          }
+        }
+      } catch {
+        // Storage fallback
+      }
+    }
+    return order;
   }
 
-  createOrder(orderData: Omit<Order, "id" | "orderNumber" | "createdAt" | "updatedAt" | "timeline">): Order {
-    const orderNumber = generateOrderNumber();
-    const id = `ord_${generateId()}`;
+  saveOrder(order: Order): Order {
+    const idx = this.orders.findIndex((o) => o.id === order.id || o.orderNumber === order.orderNumber);
+    if (idx > -1) {
+      this.orders[idx] = { ...order };
+    } else {
+      this.orders.unshift({ ...order });
+    }
+    this.persist("sd_mock_orders", this.orders);
+    return order;
+  }
+
+  createOrder(orderData: Omit<Order, "id" | "orderNumber" | "createdAt" | "updatedAt" | "timeline"> | Order): Order {
+    const isComplete = "id" in orderData && "orderNumber" in orderData;
     const now = new Date().toISOString();
+    const orderNumber = isComplete ? (orderData as Order).orderNumber : generateOrderNumber();
+    const id = isComplete ? (orderData as Order).id : `ord_${generateId()}`;
 
     const newOrder: Order = {
       ...orderData,
       id,
       orderNumber,
-      createdAt: now,
-      updatedAt: now,
-      timeline: [
-        {
-          status: "pending",
-          labelEn: "Order submitted by customer",
-          labelBn: "গ্রাহক কর্তৃক অর্ডার দাখিল করা হয়েছে",
-          timestamp: now,
-        },
-      ],
+      createdAt: isComplete ? (orderData as Order).createdAt || now : now,
+      updatedAt: isComplete ? (orderData as Order).updatedAt || now : now,
+      timeline:
+        isComplete && (orderData as Order).timeline?.length
+          ? (orderData as Order).timeline
+          : [
+              {
+                status: "pending",
+                labelEn: "Order submitted by customer",
+                labelBn: "গ্রাহক কর্তৃক অর্ডার দাখিল করা হয়েছে",
+                timestamp: now,
+              },
+            ],
     };
 
     // Decrement inventory atomically in mock store
