@@ -1,0 +1,357 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SilkenDrift Firebase Firestore Schema Specification",
+  "description": "Production NoSQL collections, documents, field specifications, data types, and index rules for SilkenDrift E-Commerce.",
+  "version": "1.0.0",
+  "database": "Cloud Firestore",
+  "collections": {
+    "users": {
+      "description": "User profiles and identity records managed alongside Firebase Authentication.",
+      "documentId": "uid (Firebase Auth UID)",
+      "fields": {
+        "uid": { "type": "string", "required": true, "description": "Unique Firebase Authentication UID" },
+        "email": { "type": "string", "required": true, "format": "email" },
+        "displayName": { "type": "string", "required": true },
+        "phoneNumber": { "type": "string", "required": false },
+        "photoURL": { "type": "string", "required": false },
+        "role": { "type": "string", "enum": ["admin", "manager", "customer"], "required": true },
+        "status": { "type": "string", "enum": ["active", "suspended", "pending"], "required": true },
+        "isDemo": { "type": "boolean", "default": false },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "customers": {
+      "description": "CRM customer profiles tracking cumulative orders, total spend in BDT, and loyalty tiers.",
+      "documentId": "customerId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true, "ref": "users" },
+        "totalOrders": { "type": "number", "default": 0 },
+        "totalSpendBDT": { "type": "number", "default": 0.00 },
+        "loyaltyTier": { "type": "string", "enum": ["Bronze", "Silver", "Gold", "Platinum"], "default": "Bronze" },
+        "notes": { "type": "string", "required": false },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "isBlocked": { "type": "boolean", "default": false },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "addresses": {
+      "description": "Customer delivery address book with cascading Bangladeshi administrative geography.",
+      "documentId": "addressId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "userId": { "type": "string", "required": true, "ref": "users" },
+        "name": { "type": "string", "required": true },
+        "phone": { "type": "string", "required": true },
+        "division": { "type": "string", "required": true },
+        "district": { "type": "string", "required": true },
+        "upazila": { "type": "string", "required": true },
+        "areaAddress": { "type": "string", "required": true },
+        "postalCode": { "type": "string", "required": true },
+        "isDefault": { "type": "boolean", "default": false },
+        "label": { "type": "string", "enum": ["Home", "Office", "Other"], "default": "Home" }
+      }
+    },
+    "categories": {
+      "description": "Storefront product categories with bilingual metadata and banner images.",
+      "documentId": "categoryId (e.g. cat_rajshahi_silk)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "slug": { "type": "string", "required": true, "unique": true },
+        "descriptionEn": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "icon": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "sortOrder": { "type": "number", "default": 0 },
+        "isActive": { "type": "boolean", "default": true },
+        "featuredOnHome": { "type": "boolean", "default": false }
+      }
+    },
+    "subcategories": {
+      "description": "Subcategories linked to primary product categories.",
+      "documentId": "subcategoryId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "categoryId": { "type": "string", "required": true, "ref": "categories" },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "slug": { "type": "string", "required": true, "unique": true },
+        "isActive": { "type": "boolean", "default": true }
+      }
+    },
+    "brands": {
+      "description": "Artisan guilds and silk heritage brands.",
+      "documentId": "brandId (e.g. br_rajshahi)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "slug": { "type": "string", "required": true, "unique": true },
+        "logoUrl": { "type": "string" },
+        "descriptionEn": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "isFeatured": { "type": "boolean", "default": false }
+      }
+    },
+    "products": {
+      "description": "Full product catalog with variants, stock levels, BDT pricing, and bilingual copy.",
+      "documentId": "productId (e.g. prod_001)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "slug": { "type": "string", "required": true, "unique": true },
+        "sku": { "type": "string", "required": true, "unique": true },
+        "descriptionEn": { "type": "string", "required": true },
+        "descriptionBn": { "type": "string", "required": true },
+        "specificationsEn": { "type": "map", "additionalProperties": { "type": "string" } },
+        "specificationsBn": { "type": "map", "additionalProperties": { "type": "string" } },
+        "categoryId": { "type": "string", "required": true, "ref": "categories" },
+        "subcategoryId": { "type": "string", "required": false },
+        "brandId": { "type": "string", "required": false, "ref": "brands" },
+        "basePriceBDT": { "type": "number", "required": true },
+        "salePriceBDT": { "type": "number", "required": false },
+        "stockTotal": { "type": "number", "required": true, "default": 0 },
+        "lowStockThreshold": { "type": "number", "default": 5 },
+        "images": { "type": "array", "items": { "type": "string" } },
+        "tags": { "type": "array", "items": { "type": "string" } },
+        "isPublished": { "type": "boolean", "default": true },
+        "isFeatured": { "type": "boolean", "default": false },
+        "isNewArrival": { "type": "boolean", "default": false },
+        "isBestSeller": { "type": "boolean", "default": false },
+        "isFlashDeal": { "type": "boolean", "default": false },
+        "discountPercentage": { "type": "number", "default": 0 },
+        "rating": { "type": "number", "default": 5.0 },
+        "reviewCount": { "type": "number", "default": 0 },
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "map",
+            "properties": {
+              "id": { "type": "string", "required": true },
+              "productId": { "type": "string", "required": true },
+              "sku": { "type": "string", "required": true },
+              "titleEn": { "type": "string" },
+              "titleBn": { "type": "string" },
+              "attributes": {
+                "type": "map",
+                "properties": {
+                  "size": { "type": "string" },
+                  "color": { "type": "string" },
+                  "material": { "type": "string" }
+                }
+              },
+              "priceBDT": { "type": "number" },
+              "salePriceBDT": { "type": "number" },
+              "stock": { "type": "number" },
+              "imageUrl": { "type": "string" },
+              "isDefault": { "type": "boolean" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "orders": {
+      "description": "Order records with customer info, item breakdown, payment status, and timeline.",
+      "documentId": "orderId (e.g. ord_seed_001)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "orderNumber": { "type": "string", "required": true, "unique": true },
+        "customerId": { "type": "string", "required": false },
+        "customerName": { "type": "string", "required": true },
+        "customerPhone": { "type": "string", "required": true },
+        "customerEmail": { "type": "string" },
+        "shippingAddress": { "type": "map", "required": true },
+        "deliveryMethod": { "type": "string", "enum": ["home_delivery", "pickup_point", "courier"] },
+        "pickupPointId": { "type": "string" },
+        "pickupPointName": { "type": "string" },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "map",
+            "properties": {
+              "id": { "type": "string" },
+              "productId": { "type": "string" },
+              "variantId": { "type": "string" },
+              "productNameEn": { "type": "string" },
+              "productNameBn": { "type": "string" },
+              "image": { "type": "string" },
+              "priceBDT": { "type": "number" },
+              "quantity": { "type": "number" },
+              "subtotalBDT": { "type": "number" }
+            }
+          }
+        },
+        "subtotalBDT": { "type": "number", "required": true },
+        "discountBDT": { "type": "number", "default": 0 },
+        "deliveryChargeBDT": { "type": "number", "default": 0 },
+        "vatBDT": { "type": "number", "default": 0 },
+        "totalBDT": { "type": "number", "required": true },
+        "orderStatus": {
+          "type": "string",
+          "enum": ["pending", "confirmed", "processing", "packed", "shipped", "out_for_delivery", "delivered", "cancelled", "returned"]
+        },
+        "paymentStatus": {
+          "type": "string",
+          "enum": ["pending", "initiated", "paid", "failed", "cod_pending", "cod_collected"]
+        },
+        "paymentMethod": { "type": "string", "enum": ["bkash", "sslcommerz", "cod"] },
+        "paymentId": { "type": "string" },
+        "courierProvider": { "type": "string", "enum": ["pathao", "steadfast", "redx", "internal"] },
+        "courierTrackingId": { "type": "string" },
+        "couponCode": { "type": "string" },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "type": "map",
+            "properties": {
+              "status": { "type": "string" },
+              "labelEn": { "type": "string" },
+              "labelBn": { "type": "string" },
+              "timestamp": { "type": "string" },
+              "note": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "inventoryMovements": {
+      "description": "Immutable ledger tracking all stock increases, sales decrements, and adjustments.",
+      "documentId": "movId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "productId": { "type": "string", "required": true },
+        "productName": { "type": "string", "required": true },
+        "type": { "type": "string", "enum": ["sourcing", "order", "adjustment", "return", "damaged"] },
+        "quantityDelta": { "type": "number", "required": true },
+        "previousStock": { "type": "number", "required": true },
+        "newStock": { "type": "number", "required": true },
+        "referenceId": { "type": "string", "required": true },
+        "reason": { "type": "string", "required": true },
+        "performedBy": { "type": "string", "required": true },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "suppliers": {
+      "description": "Silk factories, sericulture nurseries, and master weaver cooperatives.",
+      "documentId": "supplierId (e.g. sup_rajshahi)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "name": { "type": "string", "required": true },
+        "contactPerson": { "type": "string", "required": true },
+        "phone": { "type": "string", "required": true },
+        "email": { "type": "string" },
+        "address": { "type": "string", "required": true },
+        "categorySpecialty": { "type": "string", "required": true },
+        "rating": { "type": "number", "default": 5.0 },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "division": { "type": "string" },
+        "district": { "type": "string" },
+        "paymentTerms": { "type": "string" },
+        "leadTimeDays": { "type": "number", "default": 7 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "sourcingRecords": {
+      "description": "Purchase orders and incoming inventory batches from silk artisans.",
+      "documentId": "recordId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "supplierId": { "type": "string", "required": true, "ref": "suppliers" },
+        "supplierName": { "type": "string", "required": true },
+        "productId": { "type": "string", "required": true, "ref": "products" },
+        "productName": { "type": "string", "required": true },
+        "sku": { "type": "string", "required": true },
+        "quantityReceived": { "type": "number", "required": true },
+        "purchaseCostBDT": { "type": "number", "required": true },
+        "batchNumber": { "type": "string", "required": true },
+        "receivedDate": { "type": "string", "format": "date-time" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "coupons": {
+      "description": "Marketing discount codes and promotional vouchers.",
+      "documentId": "couponId (string)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "code": { "type": "string", "required": true, "unique": true },
+        "descriptionEn": { "type": "string" },
+        "descriptionBn": { "type": "string" },
+        "discountType": { "type": "string", "enum": ["percentage", "fixed"] },
+        "discountValue": { "type": "number", "required": true },
+        "minOrderBDT": { "type": "number", "default": 0 },
+        "maxDiscountBDT": { "type": "number" },
+        "startDate": { "type": "string" },
+        "endDate": { "type": "string" },
+        "usageLimit": { "type": "number" },
+        "usedCount": { "type": "number", "default": 0 },
+        "isActive": { "type": "boolean", "default": true }
+      }
+    },
+    "deliveryZones": {
+      "description": "Delivery zones and dynamic shipping rates for Bangladesh.",
+      "documentId": "zoneId (e.g. zone_dhaka)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "division": { "type": "string" },
+        "districts": { "type": "array", "items": { "type": "string" } },
+        "standardChargeBDT": { "type": "number", "required": true },
+        "freeShippingThresholdBDT": { "type": "number", "required": true },
+        "estimatedDays": { "type": "string" },
+        "isActive": { "type": "boolean", "default": true }
+      }
+    },
+    "pickupPoints": {
+      "description": "Physical Click & Collect locations and flagship lounges.",
+      "documentId": "pointId (e.g. hub_dhanmondi)",
+      "fields": {
+        "id": { "type": "string", "required": true },
+        "nameEn": { "type": "string", "required": true },
+        "nameBn": { "type": "string", "required": true },
+        "division": { "type": "string" },
+        "district": { "type": "string" },
+        "addressEn": { "type": "string" },
+        "addressBn": { "type": "string" },
+        "phone": { "type": "string" },
+        "operatingHours": { "type": "string" },
+        "isActive": { "type": "boolean", "default": true }
+      }
+    },
+    "settings": {
+      "description": "Global business metadata, logo assets, VAT rates, and operational parameters.",
+      "documentId": "business (singleton)",
+      "fields": {
+        "id": { "type": "string", "default": "business" },
+        "storeName": { "type": "string", "required": true },
+        "logoUrl": { "type": "string" },
+        "logoDarkUrl": { "type": "string" },
+        "faviconUrl": { "type": "string" },
+        "taglineEn": { "type": "string" },
+        "taglineBn": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "addressEn": { "type": "string" },
+        "addressBn": { "type": "string" },
+        "vatNumber": { "type": "string" },
+        "vatRatePercent": { "type": "number", "default": 5.0 },
+        "defaultCurrency": { "type": "string", "default": "BDT" },
+        "codMaxAmountBDT": { "type": "number", "default": 15000 },
+        "freeShippingMinBDT": { "type": "number", "default": 2500 },
+        "insideDhakaChargeBDT": { "type": "number", "default": 60 },
+        "outsideDhakaChargeBDT": { "type": "number", "default": 120 },
+        "defaultLanguage": { "type": "string", "enum": ["bn", "en"], "default": "bn" },
+        "defaultTheme": { "type": "string", "enum": ["light", "dark", "system"], "default": "light" }
+      }
+    }
+  }
+}

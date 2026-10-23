@@ -7,7 +7,15 @@
 
 **SilkenDrift** is a premier, bilingual (Bangla & English) eCommerce platform engineered specifically for Bangladesh. Specializing in authentic Rajshahi mulberry silk, UNESCO heritage Dhakai Jamdani, Men's Royal Endi Panjabis, and Tangail handlooms.
 
-The platform provides a luxurious customer-facing storefront and a protected, role-based administrative dashboard under `/admin`.
+The platform provides a luxurious customer-facing storefront and a protected, role-based administrative vault (`/sd-hq-vault-88` with `/admin` decoy protection).
+
+---
+
+## 🎯 Target Audience & Who It's For
+- **Luxury Apparel & Fashion Retailers**: Boutiques and high-end fashion brands selling sarees, panjabis, bridal lehengas, and formal wear.
+- **Artisan Cooperatives & Handloom Guilds**: Silk factories, weaver societies in Rajshahi, Tangail, and Narayanganj expanding direct-to-consumer (D2C).
+- **E-Commerce Startups & Agencies**: Developers and entrepreneurs needing an enterprise-grade Bangladeshi e-commerce suite with pre-built bKash, SSLCOMMERZ, and courier adapters.
+- **Wholesale & Sourcing Hubs**: Businesses managing supplier ledgers, artisan purchase costs, and multi-variant stock movements.
 
 ---
 
@@ -232,5 +240,31 @@ The top header includes a **Demo Role Switcher** (`RoleSwitcher`):
 
 ---
 
-## 📄 License
-SilkenDrift is proprietary software. All rights reserved.
+---
+
+## 📸 User Interface Walkthrough & Screenshots
+
+| Storefront & Catalog | Administrative Vault |
+| :---: | :---: |
+| **Bilingual Silk Storefront**<br>Bengali typography, warm gold accents, hero banner carousel, flash sales with live timers. | **Executive KPI Overview**<br>Gross revenue (BDT), order volume, low stock alerts, weekly velocity charts. |
+| **Product Detail & Variant Matrix**<br>High-resolution image zoom, sizes (38–44), fabric selections, verified reviews. | **Product & Stock Matrix Studio**<br>Bilingual descriptions, multi-variant SKU generator, image manager. |
+| **Bangladesh Cascading Checkout**<br>Division ➔ District ➔ Upazila autocomplete, bKash & SSLCOMMERZ gateway selectors. | **Order Fulfillment & Logistics**<br>Order lifecycle tracking, courier integration (Pathao / Steadfast), invoice printing. |
+| **Printable Tax Invoice & Public Tracker**<br>Clean A4 receipt printing (`@media print`) and live shipment timeline. | **Sourcing & Supplier Ledger**<br>Artisan weaver directory, batch numbers, unit costs, and inventory audit trail. |
+
+---
+
+## 📖 Complete Documentation Suite
+
+Detailed guides are provided in the repository root:
+- **[HowToSetup.md](HowToSetup.md)**: Complete step-by-step installation for clean machines, Docker (`docker compose up`), and production Linux VPS with Nginx and PM2.
+- **[CLAUDE.md](CLAUDE.md)** / **[AGENTS.md](AGENTS.md)**: Developer architecture guide, coding conventions, and check commands.
+- **[CHANGELOG.md](CHANGELOG.md)**: Detailed release history starting at v1.0.0.
+- **[database/schema.sql](database/schema.sql)**: Production ANSI SQL schema creating all 18 tables from scratch.
+- **[database/seed.sql](database/seed.sql)**: Demo seed data pre-populating silk products, categories, suppliers, and orders.
+- **[LICENSE-NOTE.md](LICENSE-NOTE.md)**: Commercial license terms and permissions.
+
+---
+
+## 📄 License Note
+
+SilkenDrift is distributed under a commercial digital license on Vibe96. Buyers receive full source code access for commercial and personal deployments. Please consult [LICENSE-NOTE.md](LICENSE-NOTE.md) for full terms, permissions, and warranty details.

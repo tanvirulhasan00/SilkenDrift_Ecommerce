@@ -1,0 +1,961 @@
+{
+  "categories": {
+    "cat_rajshahi_silk": {
+      "id": "cat_rajshahi_silk",
+      "nameEn": "Rajshahi Silk Sarees",
+      "nameBn": "রাজশাহী সিল্ক শাড়ি",
+      "slug": "rajshahi-silk-sarees",
+      "descriptionEn": "Authentic mulberry silk sarees handwoven by artisans of Rajshahi.",
+      "descriptionBn": "রাজশাহীর ঐতিহ্যবাহী তুঁত সিল্কের সূক্ষ্ম কারুকার্যময় অভিজাত শাড়ি।",
+      "icon": "Sparkles",
+      "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=800&q=80",
+      "sortOrder": 1,
+      "isActive": true,
+      "featuredOnHome": true
+    },
+    "cat_dhakai_jamdani": {
+      "id": "cat_dhakai_jamdani",
+      "nameEn": "Dhakai Jamdani",
+      "nameBn": "ঢাকাই জামদানি",
+      "slug": "dhakai-jamdani",
+      "descriptionEn": "Intricate floral and geometric handloom motifs certified by UNESCO heritage weavers.",
+      "descriptionBn": "শীতলক্ষ্যা পাড়ের বিশ্বখ্যাত তাঁতিদের বোনা কারুকাজময় ঐতিহ্যবাহী ঢাকাই জামদানি।",
+      "icon": "Crown",
+      "imageUrl": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=800&q=80",
+      "sortOrder": 2,
+      "isActive": true,
+      "featuredOnHome": true
+    },
+    "cat_mens_panjabi": {
+      "id": "cat_mens_panjabi",
+      "nameEn": "Men's Silk Panjabi",
+      "nameBn": "পুরুষদের সিল্ক পাঞ্জাবি",
+      "slug": "mens-silk-panjabi",
+      "descriptionEn": "Tailored pure silk & endi silk panjabis for Eid, weddings, and formal occasions.",
+      "descriptionBn": "ঈদ ও বিয়ের আয়োজনে খাঁটি সিল্ক ও এন্ডি সিল্কের দৃষ্টিনন্দন প্রিমিয়াম পাঞ্জাবি।",
+      "icon": "User",
+      "imageUrl": "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=800&q=80",
+      "sortOrder": 3,
+      "isActive": true,
+      "featuredOnHome": true
+    },
+    "cat_muslin_shawls": {
+      "id": "cat_muslin_shawls",
+      "nameEn": "Muslin & Silk Shawls",
+      "nameBn": "মসলিন ও সিল্ক শাল",
+      "slug": "muslin-silk-shawls",
+      "descriptionEn": "Featherlight heirloom muslin wraps and hand-embroidered winter silk stoles.",
+      "descriptionBn": "হালকা বাতাসের মতো কোমল মসলিন ও নকশিকাঁথা কাজের এক্সক্লুসিভ উইন্টার সিল্ক শাল।",
+      "icon": "Feather",
+      "imageUrl": "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?auto=format&fit=crop&w=800&q=80",
+      "sortOrder": 4,
+      "isActive": true,
+      "featuredOnHome": true
+    },
+    "cat_tangail_handloom": {
+      "id": "cat_tangail_handloom",
+      "nameEn": "Tangail Silk & Tant",
+      "nameBn": "টাঙ্গাইল সিল্ক ও তাঁত",
+      "slug": "tangail-silk-tant",
+      "descriptionEn": "Renowned Tangail soft silk jacquard and cotton silk festive wear.",
+      "descriptionBn": "টাঙ্গাইলের ঐতিহ্যবাহী সুতা ও সফট সিল্কের নিপুণ বোনা শাড়ি।",
+      "icon": "Layers",
+      "imageUrl": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=800&q=80",
+      "sortOrder": 5,
+      "isActive": true,
+      "featuredOnHome": true
+    }
+  },
+  "brands": {
+    "brand_rajshahi_heritage": {
+      "id": "brand_rajshahi_heritage",
+      "nameEn": "Rajshahi Silk Board Artisans",
+      "nameBn": "রাজশাহী সিল্ক বোর্ড",
+      "slug": "rajshahi-silk-board",
+      "logoUrl": "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=200&q=80",
+      "isFeatured": true
+    },
+    "brand_shitalakhya_looms": {
+      "id": "brand_shitalakhya_looms",
+      "nameEn": "Shitalakhya Heritage Looms",
+      "nameBn": "শীতলক্ষ্যা হেরিটেজ লুমস",
+      "slug": "shitalakhya-looms",
+      "logoUrl": "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?auto=format&fit=crop&w=200&q=80",
+      "isFeatured": true
+    },
+    "brand_silkendrift_signature": {
+      "id": "brand_silkendrift_signature",
+      "nameEn": "SilkenDrift Signature Bespoke",
+      "nameBn": "সিল্কেনড্রিফট সিগনেচার",
+      "slug": "silkendrift-signature",
+      "logoUrl": "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=200&q=80",
+      "isFeatured": true
+    }
+  },
+  "products": {
+    "prod_padma_silk_saree": {
+      "id": "prod_padma_silk_saree",
+      "nameEn": "Padma Gold Zari Rajshahi Mulberry Silk Saree",
+      "nameBn": "পদ্মা গোল্ড জরি রাজশাহী মালবেরি সিল্ক শাড়ি",
+      "slug": "padma-gold-zari-rajshahi-mulberry-silk-saree",
+      "sku": "SD-RS-001",
+      "categoryId": "cat_rajshahi_silk",
+      "brandId": "brand_rajshahi_heritage",
+      "basePriceBDT": 14500,
+      "salePriceBDT": 12800,
+      "discountPercentage": 12,
+      "stockTotal": 18,
+      "lowStockThreshold": 4,
+      "rating": 4.9,
+      "reviewCount": 38,
+      "isPublished": true,
+      "isFeatured": true,
+      "isNewArrival": true,
+      "isBestSeller": true,
+      "isFlashDeal": true,
+      "tags": [
+        "rajshahi-silk",
+        "wedding",
+        "festive",
+        "handloom",
+        "zari"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80"
+      ],
+      "descriptionEn": "Crafted from 100% pure Grade-A mulberry silk threads spun in the historic sericulture basins of Rajshahi. Features a lustrous drape, hand-guided golden zari border inspired by the meandering Padma river, and an unstitched matching silk blouse piece.",
+      "descriptionBn": "রাজশাহীর ঐতিহ্যবাহী রেশমপল্লীর ১০০% খাঁটি তুঁত সিল্কের সুতোয় বোনা প্রিমিয়াম শাড়ি। সাথে রয়েছে পদ্মার ঢেউ অনুপ্রাণিত নিখুঁত সোনালি জরি পাড় এবং মানানসই আনস্টিচড সিল্ক ব্লাউজ পিস। যেকোনো উৎসব ও বিয়ের জন্য অনন্য নির্বাচন।",
+      "specificationsEn": {
+        "Fabric Material": "100% Pure Mulberry Silk (Rajshahi)",
+        "Length": "6.3 Meters (Including Blouse Piece)",
+        "Weave": "Authentic Handloom Plain Weave with Zari Pallu",
+        "Care Instructions": "Dry Clean Recommended Only",
+        "Origin": "Rajshahi, Bangladesh"
+      },
+      "specificationsBn": {
+        "ফ্যাব্রিক": "১০০% খাঁটি মালবেরি রেশম সিল্ক (রাজশাহী)",
+        "দৈর্ঘ্য": "৬.৩ মিটার (ব্লাউজ পিস সহ)",
+        "বুনন": "হাতে বোনা পিওর সিল্ক ও গোল্ডেন জরি আঁচল",
+        "যত্ন": "শুধুমাত্র ড্রাই ওয়াশ প্রযোজ্য",
+        "উৎপাদন": "রাজশাহী, বাংলাদেশ"
+      },
+      "variants": [
+        {
+          "id": "var_padma_crimson",
+          "productId": "prod_padma_silk_saree",
+          "sku": "SD-RS-001-CR",
+          "titleEn": "Royal Crimson & Gold",
+          "titleBn": "রয়্যাল লাল ও সোনালি",
+          "attributes": {
+            "color": "Royal Crimson",
+            "size": "Standard 6.3m"
+          },
+          "priceBDT": 14500,
+          "salePriceBDT": 12800,
+          "stock": 10,
+          "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80",
+          "images": [
+            "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80"
+          ],
+          "isDefault": true
+        },
+        {
+          "id": "var_padma_emerald",
+          "productId": "prod_padma_silk_saree",
+          "sku": "SD-RS-001-EM",
+          "titleEn": "Deep Emerald & Antique Gold",
+          "titleBn": "পান্না সবুজ ও অ্যান্টিক গোল্ড",
+          "attributes": {
+            "color": "Deep Emerald",
+            "size": "Standard 6.3m"
+          },
+          "priceBDT": 14500,
+          "salePriceBDT": 12800,
+          "stock": 8,
+          "imageUrl": "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80",
+          "images": [
+            "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80",
+            "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80"
+          ],
+          "isDefault": false
+        },
+        {
+          "id": "var_padma_sapphire",
+          "productId": "prod_padma_silk_saree",
+          "sku": "SD-RS-001-RB",
+          "titleEn": "Royal Sapphire Blue",
+          "titleBn": "নীলকান্তমণি নীল",
+          "attributes": {
+            "color": "Royal Blue",
+            "size": "Standard 6.3m"
+          },
+          "priceBDT": 14500,
+          "salePriceBDT": 12800,
+          "stock": 6,
+          "imageUrl": "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=1000&q=80",
+          "images": [
+            "https://images.unsplash.com/photo-1609357605129-26f69add5d6e?auto=format&fit=crop&w=1000&q=80",
+            "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=1000&q=80"
+          ],
+          "isDefault": false
+        }
+      ],
+      "createdAt": "2026-01-10T10:00:00Z",
+      "updatedAt": "2026-02-15T12:00:00Z"
+    },
+    "prod_dhakai_jamdani_terchi": {
+      "id": "prod_dhakai_jamdani_terchi",
+      "nameEn": "Heirloom 84-Count Dhakai Jamdani Saree (Terchi Jaal)",
+      "nameBn": "হেরিটেজ ৮৪ কাউন্ট ঢাকাই জামদানি শাড়ি (তেরছা জাল)",
+      "slug": "heirloom-84-count-dhakai-jamdani-saree-terchi-jaal",
+      "sku": "SD-DJ-002",
+      "categoryId": "cat_dhakai_jamdani",
+      "brandId": "brand_shitalakhya_looms",
+      "basePriceBDT": 28500,
+      "salePriceBDT": 26000,
+      "discountPercentage": 9,
+      "stockTotal": 6,
+      "lowStockThreshold": 2,
+      "rating": 5,
+      "reviewCount": 24,
+      "isPublished": true,
+      "isFeatured": true,
+      "isNewArrival": true,
+      "isBestSeller": true,
+      "isFlashDeal": false,
+      "tags": [
+        "jamdani",
+        "heritage",
+        "unesco",
+        "narayanganj",
+        "shitalakhya"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80"
+      ],
+      "descriptionEn": "A masterpiece of intangible cultural heritage woven on traditional bamboo pit-looms along the Shitalakhya river. Counted 84-ply fine cotton-silk yarn adorned with intricate diagonal floral lattice (terchi jaal) taking over 45 days of artisan craftsmanship.",
+      "descriptionBn": "শীতলক্ষ্যা নদীর কূলবর্তী রূপগঞ্জের ঐতিহ্যবাহী তাঁতিদের হাতে গড়া ৮৪ কাউন্টের জমকালো তেরছা জাল ঢাকাই জামদানি। প্রতিটি সূক্ষ্ম মোটিফ বুনতে সময় লেগেছে দীর্ঘ দেড় মাস। আভিজাত্যের নিখুঁত প্রকাশ।",
+      "specificationsEn": {
+        "Count": "84-Count Fine Cotton-Silk Blend",
+        "Motif": "Traditional Terchi Jaal with Panna Buti",
+        "ArtisanTime": "Approx 45 Days per Piece",
+        "Origin": "Rupganj, Narayanganj, Bangladesh"
+      },
+      "specificationsBn": {
+        "কাউন্ট": "৮৪ কাউন্ট ফাইন কটন-সিল্ক মিশ্রণ",
+        "নকশা": "ঐতিহ্যবাহী তেরছা জাল ও পান্না বুটি",
+        "নির্মাণকাল": "প্রতিটি শাড়িতে প্রায় ৪৫ দিন শ্রম",
+        "উৎস": "রূপগঞ্জ, নারায়ণগঞ্জ"
+      },
+      "variants": [
+        {
+          "id": "var_jamdani_pearl",
+          "productId": "prod_dhakai_jamdani_terchi",
+          "sku": "SD-DJ-002-PR",
+          "titleEn": "Pearl White & Rose Gold",
+          "titleBn": "মুক্তা সাদা ও রোজ গোল্ড",
+          "attributes": {
+            "color": "Pearl White",
+            "size": "Standard 5.5m"
+          },
+          "priceBDT": 28500,
+          "salePriceBDT": 26000,
+          "stock": 3,
+          "imageUrl": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1000&q=80"
+        },
+        {
+          "id": "var_jamdani_midnight",
+          "productId": "prod_dhakai_jamdani_terchi",
+          "sku": "SD-DJ-002-MN",
+          "titleEn": "Midnight Navy & Silver Resham",
+          "titleBn": "মিডনাইট নেভি ও রূপালি রেশম",
+          "attributes": {
+            "color": "Midnight Navy",
+            "size": "Standard 5.5m"
+          },
+          "priceBDT": 28500,
+          "salePriceBDT": 26000,
+          "stock": 3,
+          "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80"
+        }
+      ],
+      "createdAt": "2026-01-15T11:00:00Z",
+      "updatedAt": "2026-02-18T14:00:00Z"
+    },
+    "prod_endi_silk_panjabi": {
+      "id": "prod_endi_silk_panjabi",
+      "nameEn": "Bespoke Royal Endi Silk Embroidered Panjabi",
+      "nameBn": "রাজকীয় এন্ডি সিল্ক নকশী এমব্রয়ডারি করা পাঞ্জাবি",
+      "slug": "bespoke-royal-endi-silk-embroidered-panjabi",
+      "sku": "SD-MP-003",
+      "categoryId": "cat_mens_panjabi",
+      "brandId": "brand_silkendrift_signature",
+      "basePriceBDT": 6800,
+      "salePriceBDT": 5950,
+      "discountPercentage": 12,
+      "stockTotal": 34,
+      "lowStockThreshold": 5,
+      "rating": 4.8,
+      "reviewCount": 42,
+      "isPublished": true,
+      "isFeatured": true,
+      "isNewArrival": true,
+      "isBestSeller": true,
+      "isFlashDeal": true,
+      "tags": [
+        "panjabi",
+        "menswear",
+        "eid",
+        "endi-silk",
+        "bespoke"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1000&q=80"
+      ],
+      "descriptionEn": "Tailored from textured wild Endi (Eri) silk offering breathable elegance and gentle natural sheen. Accented with subtle tonal thread embroidery along the mandarin collar and placket with metal buttons.",
+      "descriptionBn": "প্রাকৃতিক এন্ডি সিল্ক কাপড়ে তৈরি প্রিমিয়াম পাঞ্জাবি। আরামদায়ক টেক্সচার ও স্বাভাবিক লাস্টার সম্পন্ন। কলার ও প্লেকেটে সূক্ষ্ম সুতার হাতের কাজ এবং প্রিমিয়াম মেটালিক বোতাম।",
+      "specificationsEn": {
+        "Material": "100% Handspun Endi Wild Silk",
+        "Collar": "Mandarin Band Collar with Hand Embroidery",
+        "Fit": "Slim-Regular Tailored Cut",
+        "Buttons": "Engraved Antique Brass Plated"
+      },
+      "specificationsBn": {
+        "উপাদান": "১০০% হ্যান্ডস্পান এন্ডি রেশম সিল্ক",
+        "কলার": "ম্যান্ডারিন কলার সহ সুতার কারুকাজ",
+        "কাটিং": "স্লিম-রেগুলার প্রিমিয়াম ফিট",
+        "বোতাম": "অ্যান্টিক ব্রাস কোটিং মেটাল বাটন"
+      },
+      "variants": [
+        {
+          "id": "var_panjabi_cream_40",
+          "productId": "prod_endi_silk_panjabi",
+          "sku": "SD-MP-003-CR40",
+          "titleEn": "Ivory Cream / Size 40",
+          "titleBn": "আইভরি ক্রিম / সাইজ ৪০",
+          "attributes": {
+            "color": "Ivory Cream",
+            "size": "40"
+          },
+          "priceBDT": 6800,
+          "salePriceBDT": 5950,
+          "stock": 12
+        },
+        {
+          "id": "var_panjabi_cream_42",
+          "productId": "prod_endi_silk_panjabi",
+          "sku": "SD-MP-003-CR42",
+          "titleEn": "Ivory Cream / Size 42",
+          "titleBn": "আইভরি ক্রিম / সাইজ ৪২",
+          "attributes": {
+            "color": "Ivory Cream",
+            "size": "42"
+          },
+          "priceBDT": 6800,
+          "salePriceBDT": 5950,
+          "stock": 14
+        },
+        {
+          "id": "var_panjabi_navy_42",
+          "productId": "prod_endi_silk_panjabi",
+          "sku": "SD-MP-003-NV42",
+          "titleEn": "Midnight Charcoal / Size 42",
+          "titleBn": "মিডনাইট চারকোল / সাইজ ৪২",
+          "attributes": {
+            "color": "Midnight Charcoal",
+            "size": "42"
+          },
+          "priceBDT": 6800,
+          "salePriceBDT": 5950,
+          "stock": 8
+        }
+      ],
+      "createdAt": "2026-01-20T09:00:00Z",
+      "updatedAt": "2026-02-10T16:00:00Z"
+    },
+    "prod_kashmiri_resham_shawl": {
+      "id": "prod_kashmiri_resham_shawl",
+      "nameEn": "Bengal Muslin & Tussar Silk Hand-Embroidered Shawl",
+      "nameBn": "বেঙ্গল মসলিন ও তসর সিল্ক নকশী কাঁথা শাল",
+      "slug": "bengal-muslin-tussar-silk-hand-embroidered-shawl",
+      "sku": "SD-SW-004",
+      "categoryId": "cat_muslin_shawls",
+      "brandId": "brand_silkendrift_signature",
+      "basePriceBDT": 9200,
+      "salePriceBDT": 7900,
+      "discountPercentage": 14,
+      "stockTotal": 15,
+      "lowStockThreshold": 3,
+      "rating": 4.9,
+      "reviewCount": 19,
+      "isPublished": true,
+      "isFeatured": true,
+      "isNewArrival": false,
+      "isBestSeller": true,
+      "isFlashDeal": false,
+      "tags": [
+        "shawl",
+        "winter",
+        "tussar",
+        "muslin",
+        "nakshi-kantha"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80"
+      ],
+      "descriptionEn": "Hand-embroidered pure Tussar silk wrap adorned with traditional Bengal Nakshi-Kantha needlework by rural women artisans of Jashore. Warm, luxurious, and an heirloom piece.",
+      "descriptionBn": "যশোরের গ্রামীণ কারিগর নারীদের সূচিশিল্পে বোনা খাঁটি তসর সিল্ক নকশী কাঁথা শাল। প্রতিটি শালের মোটিফে বাংলার চিরায়ত প্রকৃতি ও শিল্পের ছোঁয়া। শীতের উৎসবে উষ্ণতা ও আভিজাত্যের প্রতীক।",
+      "specificationsEn": {
+        "Fabric": "100% Wild Tussar Silk with Fine Muslin Border",
+        "Dimensions": "2.2 Meters x 1.0 Meter",
+        "Work": "Artisan Hand-stitched Nakshi Kantha Motifs",
+        "Origin": "Jashore, Bangladesh"
+      },
+      "specificationsBn": {
+        "ফ্যাব্রিক": "১০০% ওয়াইল্ড তসর সিল্ক সাথে ফাইন মসলিন পাড়",
+        "সাইজ": "২.২ মিটার x ১.০ মিটার",
+        "কাজ": "হস্তশিল্প নকশী কাঁথা মোটিফ",
+        "উৎস": "যশোর, বাংলাদেশ"
+      },
+      "variants": [
+        {
+          "id": "var_shawl_ochre",
+          "productId": "prod_kashmiri_resham_shawl",
+          "sku": "SD-SW-004-OC",
+          "titleEn": "Golden Ochre & Black Resham",
+          "titleBn": "সোনালি গেরুয়া ও কালো রেশম",
+          "attributes": {
+            "color": "Golden Ochre",
+            "size": "2.2m x 1.0m"
+          },
+          "priceBDT": 9200,
+          "salePriceBDT": 7900,
+          "stock": 8
+        },
+        {
+          "id": "var_shawl_burgundy",
+          "productId": "prod_kashmiri_resham_shawl",
+          "sku": "SD-SW-004-BG",
+          "titleEn": "Deep Burgundy & Cream",
+          "titleBn": "ডিপ বারগান্ডি ও ক্রিম",
+          "attributes": {
+            "color": "Deep Burgundy",
+            "size": "2.2m x 1.0m"
+          },
+          "priceBDT": 9200,
+          "salePriceBDT": 7900,
+          "stock": 7
+        }
+      ],
+      "createdAt": "2026-01-05T08:00:00Z",
+      "updatedAt": "2026-02-14T10:00:00Z"
+    },
+    "prod_tangail_soft_silk": {
+      "id": "prod_tangail_soft_silk",
+      "nameEn": "Tangail Jacquard Soft Silk Festive Saree",
+      "nameBn": "টাঙ্গাইল জ্যাকার্ড সফট সিল্ক উৎসব শাড়ি",
+      "slug": "tangail-jacquard-soft-silk-festive-saree",
+      "sku": "SD-TS-005",
+      "categoryId": "cat_tangail_handloom",
+      "brandId": "brand_shitalakhya_looms",
+      "basePriceBDT": 5600,
+      "salePriceBDT": 4750,
+      "discountPercentage": 15,
+      "stockTotal": 25,
+      "lowStockThreshold": 5,
+      "rating": 4.7,
+      "reviewCount": 31,
+      "isPublished": true,
+      "isFeatured": true,
+      "isNewArrival": true,
+      "isBestSeller": false,
+      "isFlashDeal": true,
+      "tags": [
+        "tangail",
+        "soft-silk",
+        "affordable",
+        "festive"
+      ],
+      "images": [
+        "https://images.unsplash.com/photo-1617627143750-d86bc21e42bb?auto=format&fit=crop&w=1000&q=80",
+        "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1000&q=80"
+      ],
+      "descriptionEn": "Featherweight soft silk woven on jacquard looms in Bajitpur, Tangail. Easy to drape, vibrant color fastness, and an all-day comfort wear for family get-togethers.",
+      "descriptionBn": "টাঙ্গাইলের বাজিতপুরের তাঁতিদের বোনা মসৃণ ও ওজনে হালকা সফট সিল্ক শাড়ি। পরতে দারুণ আরামদায়ক এবং সারাদিনের উৎসবে নিখুঁত সঙ্গী।",
+      "specificationsEn": {
+        "Fabric": "Tangail Soft Silk & Cotton Weft",
+        "Length": "6.2 Meters with Blouse Piece",
+        "Origin": "Tangail, Bangladesh"
+      },
+      "specificationsBn": {
+        "ফ্যাব্রিক": "টাঙ্গাইল সফট সিল্ক ও সুতি বুনন",
+        "দৈর্ঘ্য": "৬.২ মিটার (ব্লাউজ পিস সহ)",
+        "উৎস": "টাঙ্গাইল, বাংলাদেশ"
+      },
+      "variants": [
+        {
+          "id": "var_tangail_mustard",
+          "productId": "prod_tangail_soft_silk",
+          "sku": "SD-TS-005-MS",
+          "titleEn": "Mustard Gold & Magenta",
+          "titleBn": "সরিষা সোনালি ও ম্যাজেন্টা",
+          "attributes": {
+            "color": "Mustard Gold",
+            "size": "Standard 6.2m"
+          },
+          "priceBDT": 5600,
+          "salePriceBDT": 4750,
+          "stock": 15
+        },
+        {
+          "id": "var_tangail_teal",
+          "productId": "prod_tangail_soft_silk",
+          "sku": "SD-TS-005-TL",
+          "titleEn": "Peacock Teal & Silver",
+          "titleBn": "ময়ূরকণ্ঠী টিল ও রূপালি",
+          "attributes": {
+            "color": "Peacock Teal",
+            "size": "Standard 6.2m"
+          },
+          "priceBDT": 5600,
+          "salePriceBDT": 4750,
+          "stock": 10
+        }
+      ],
+      "createdAt": "2026-01-25T14:00:00Z",
+      "updatedAt": "2026-02-17T11:00:00Z"
+    }
+  },
+  "suppliers": {
+    "supp_rajshahi_weavers_coop": {
+      "id": "supp_rajshahi_weavers_coop",
+      "name": "Rajshahi Resham Shilpa Cooperative",
+      "contactPerson": "Md. Rafiqul Islam",
+      "phone": "+8801711223344",
+      "email": "resham.rajshahi@silkendrift.com",
+      "address": "Boshontopur, Rajshahi Sadar, Rajshahi",
+      "categorySpecialty": "Pure Mulberry & Endi Silk",
+      "rating": 4.9,
+      "status": "active",
+      "notes": "Direct supplier of raw cocoons and yarn reeled mulberry silk.",
+      "createdAt": "2025-06-01T00:00:00Z"
+    },
+    "supp_jamdani_rupganj": {
+      "id": "supp_jamdani_rupganj",
+      "name": "Shitalakhya Jamdani Guild",
+      "contactPerson": "Master Weaver Al-Amin",
+      "phone": "+8801819887766",
+      "email": "rupganj.guild@silkendrift.com",
+      "address": "Noapara, Rupganj, Narayanganj",
+      "categorySpecialty": "Dhakai Jamdani & Fine Muslin",
+      "rating": 5,
+      "status": "active",
+      "notes": "National craft award winners specializing in 84+ count heritage weaves.",
+      "createdAt": "2025-07-15T00:00:00Z"
+    },
+    "supp_tangail_looms": {
+      "id": "supp_tangail_looms",
+      "name": "Tangail Bajitpur Handloom Alliance",
+      "contactPerson": "Subrata Basak",
+      "phone": "+8801912345678",
+      "email": "bajitpur.looms@silkendrift.com",
+      "address": "Bajitpur, Tangail",
+      "categorySpecialty": "Tangail Soft Silk & Tant",
+      "rating": 4.7,
+      "status": "active",
+      "createdAt": "2025-08-20T00:00:00Z"
+    }
+  },
+  "sourcingRecords": {
+    "src_001": {
+      "id": "src_001",
+      "supplierId": "supp_rajshahi_weavers_coop",
+      "supplierName": "Rajshahi Resham Shilpa Cooperative",
+      "productId": "prod_padma_silk_saree",
+      "productName": "Padma Gold Zari Rajshahi Mulberry Silk Saree",
+      "sku": "SD-RS-001",
+      "quantityReceived": 30,
+      "purchaseCostBDT": 8200,
+      "batchNumber": "BATCH-RS-2026-01",
+      "receivedDate": "2026-01-08",
+      "notes": "Inspected at Rajshahi warehouse; certified Grade-A silk purity."
+    },
+    "src_002": {
+      "id": "src_002",
+      "supplierId": "supp_jamdani_rupganj",
+      "supplierName": "Shitalakhya Jamdani Guild",
+      "productId": "prod_dhakai_jamdani_terchi",
+      "productName": "Heirloom 84-Count Dhakai Jamdani Saree (Terchi Jaal)",
+      "sku": "SD-DJ-002",
+      "quantityReceived": 10,
+      "purchaseCostBDT": 17500,
+      "batchNumber": "BATCH-DJ-2026-02",
+      "receivedDate": "2026-01-12",
+      "notes": "Handmade pit-loom weave; each numbered and tagged with artisan seal."
+    },
+    "src_003": {
+      "id": "src_003",
+      "supplierId": "supp_rajshahi_weavers_coop",
+      "supplierName": "Rajshahi Resham Shilpa Cooperative",
+      "productId": "prod_endi_silk_panjabi",
+      "productName": "Bespoke Royal Endi Silk Embroidered Panjabi",
+      "sku": "SD-MP-003",
+      "quantityReceived": 50,
+      "purchaseCostBDT": 3400,
+      "batchNumber": "BATCH-MP-2026-03",
+      "receivedDate": "2026-01-18",
+      "notes": "Custom tailoring batch for upcoming festive season."
+    }
+  },
+  "orders": {
+    "ord_sd_2026_101": {
+      "id": "ord_sd_2026_101",
+      "orderNumber": "SD-260215-4819",
+      "customerName": "Sharmin Sultana",
+      "customerPhone": "+8801712345678",
+      "customerEmail": "sharmin.sultana@example.com",
+      "shippingAddress": {
+        "id": "addr_01",
+        "name": "Sharmin Sultana",
+        "phone": "+8801712345678",
+        "division": "dhaka",
+        "district": "dhaka_dist",
+        "upazila": "Gulshan",
+        "areaAddress": "House 24, Road 113, Gulshan-2",
+        "postalCode": "1212"
+      },
+      "deliveryMethod": "home_delivery",
+      "items": [
+        {
+          "id": "item_01",
+          "productId": "prod_padma_silk_saree",
+          "variantId": "var_padma_crimson",
+          "productNameEn": "Padma Gold Zari Rajshahi Mulberry Silk Saree",
+          "productNameBn": "পদ্মা গোল্ড জরি রাজশাহী মালবেরি সিল্ক শাড়ি",
+          "image": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=400&q=80",
+          "priceBDT": 12800,
+          "quantity": 1,
+          "subtotalBDT": 12800,
+          "attributes": {
+            "color": "Royal Crimson",
+            "size": "Standard 6.3m"
+          }
+        }
+      ],
+      "subtotalBDT": 12800,
+      "discountBDT": 1280,
+      "deliveryChargeBDT": 0,
+      "vatBDT": 0,
+      "totalBDT": 11520,
+      "orderStatus": "shipped",
+      "paymentStatus": "paid",
+      "paymentMethod": "bkash",
+      "paymentId": "BKASH_TRX_9A8B7C6D",
+      "courierProvider": "pathao",
+      "courierTrackingId": "PTH-DH-982144",
+      "couponCode": "SILKSPRING",
+      "notes": "Deliver between 2 PM to 5 PM if possible.",
+      "timeline": [
+        {
+          "status": "pending",
+          "labelEn": "Order placed by customer",
+          "labelBn": "গ্রাহক দ্বারা অর্ডার সম্পন্ন হয়েছে",
+          "timestamp": "2026-02-15T10:14:00Z"
+        },
+        {
+          "status": "confirmed",
+          "labelEn": "Payment verified via bKash gateway",
+          "labelBn": "বিকাশ পেমেন্ট যাচাই সম্পন্ন",
+          "timestamp": "2026-02-15T10:16:00Z"
+        },
+        {
+          "status": "processing",
+          "labelEn": "Quality check in progress at Central Hub",
+          "labelBn": "সেন্ট্রাল হাবে গুণগত মান যাচাই চলছে",
+          "timestamp": "2026-02-15T14:30:00Z"
+        },
+        {
+          "status": "shipped",
+          "labelEn": "Handed over to Pathao Courier",
+          "labelBn": "পাঠাও কুরিয়ারে হস্তান্তর করা হয়েছে",
+          "timestamp": "2026-02-16T09:00:00Z",
+          "note": "Tracking: PTH-DH-982144"
+        }
+      ],
+      "createdAt": "2026-02-15T10:14:00Z",
+      "updatedAt": "2026-02-16T09:00:00Z"
+    },
+    "ord_sd_2026_102": {
+      "id": "ord_sd_2026_102",
+      "orderNumber": "SD-260216-3912",
+      "customerName": "Tanvir Ahmed",
+      "customerPhone": "+8801819554433",
+      "customerEmail": "tanvir.ahmed@example.com",
+      "shippingAddress": {
+        "id": "addr_02",
+        "name": "Tanvir Ahmed",
+        "phone": "+8801819554433",
+        "division": "chattogram",
+        "district": "chattogram_dist",
+        "upazila": "Agrabad",
+        "areaAddress": "Plot 18, Commercial Area, Agrabad",
+        "postalCode": "4100"
+      },
+      "deliveryMethod": "home_delivery",
+      "items": [
+        {
+          "id": "item_02",
+          "productId": "prod_endi_silk_panjabi",
+          "variantId": "var_panjabi_cream_42",
+          "productNameEn": "Bespoke Royal Endi Silk Embroidered Panjabi",
+          "productNameBn": "রাজকীয় এন্ডি সিল্ক নকশী এমব্রয়ডারি করা পাঞ্জাবি",
+          "image": "https://images.unsplash.com/photo-1597983073493-88cd35cf93b0?auto=format&fit=crop&w=400&q=80",
+          "priceBDT": 5950,
+          "quantity": 1,
+          "subtotalBDT": 5950,
+          "attributes": {
+            "color": "Ivory Cream",
+            "size": "42"
+          }
+        }
+      ],
+      "subtotalBDT": 5950,
+      "discountBDT": 0,
+      "deliveryChargeBDT": 120,
+      "vatBDT": 0,
+      "totalBDT": 6070,
+      "orderStatus": "processing",
+      "paymentStatus": "cod_pending",
+      "paymentMethod": "cod",
+      "courierProvider": "steadfast",
+      "courierTrackingId": "STF-CTG-44910",
+      "timeline": [
+        {
+          "status": "pending",
+          "labelEn": "Order placed via Cash on Delivery",
+          "labelBn": "ক্যাশ অন ডেলিভারিতে অর্ডার গ্রহণ করা হয়েছে",
+          "timestamp": "2026-02-16T11:20:00Z"
+        },
+        {
+          "status": "confirmed",
+          "labelEn": "Customer confirmed via phone verification",
+          "labelBn": "ফোনে গ্রাহকের নিশ্চিতকরণ সম্পন্ন",
+          "timestamp": "2026-02-16T12:00:00Z"
+        },
+        {
+          "status": "processing",
+          "labelEn": "Item packed in custom gift box",
+          "labelBn": "কাস্টম গিফট বক্সে প্যাকেজিং সম্পন্ন",
+          "timestamp": "2026-02-16T16:00:00Z"
+        }
+      ],
+      "createdAt": "2026-02-16T11:20:00Z",
+      "updatedAt": "2026-02-16T16:00:00Z"
+    }
+  },
+  "deliveryZones": {
+    "zone_dhaka_city": {
+      "id": "zone_dhaka_city",
+      "nameEn": "Inside Dhaka City (Rapid)",
+      "nameBn": "ঢাকা সিটির ভেতরে (দ্রুততম)",
+      "division": "dhaka",
+      "districts": [
+        "dhaka_dist"
+      ],
+      "standardChargeBDT": 60,
+      "freeShippingThresholdBDT": 2500,
+      "estimatedDays": "24-48 Hours",
+      "isActive": true
+    },
+    "zone_greater_dhaka": {
+      "id": "zone_greater_dhaka",
+      "nameEn": "Suburbs & Greater Dhaka",
+      "nameBn": "ঢাকা আশপাশ ও গ্রেটার ঢাকা",
+      "division": "dhaka",
+      "districts": [
+        "gazipur",
+        "narayanganj",
+        "tangail",
+        "faridpur"
+      ],
+      "standardChargeBDT": 90,
+      "freeShippingThresholdBDT": 3500,
+      "estimatedDays": "2-3 Days",
+      "isActive": true
+    },
+    "zone_nationwide": {
+      "id": "zone_nationwide",
+      "nameEn": "All Other Bangladesh Districts",
+      "nameBn": "সারাদেশের অন্যান্য জেলা",
+      "division": "all",
+      "districts": [],
+      "standardChargeBDT": 120,
+      "freeShippingThresholdBDT": 4000,
+      "estimatedDays": "3-5 Days",
+      "isActive": true
+    }
+  },
+  "pickupPoints": {
+    "hub_dhanmondi": {
+      "id": "hub_dhanmondi",
+      "nameEn": "SilkenDrift Experience Hub — Dhanmondi",
+      "nameBn": "সিল্কেনড্রিফট এক্সপেরিয়েন্স হাব — ধানমন্ডি",
+      "division": "dhaka",
+      "district": "dhaka_dist",
+      "addressEn": "House 32, Road 7A, Dhanmondi, Dhaka",
+      "addressBn": "বাড়ি ৩২, রোড ৭এ, ধানমন্ডি, ঢাকা",
+      "phone": "+8801700998811",
+      "operatingHours": "10:00 AM - 9:00 PM (Daily)",
+      "isActive": true
+    },
+    "hub_gulshan": {
+      "id": "hub_gulshan",
+      "nameEn": "SilkenDrift Flagship Studio — Gulshan",
+      "nameBn": "সিল্কেনড্রিফট ফ্ল্যাগশিপ স্টুডিও — গুলশান",
+      "division": "dhaka",
+      "district": "dhaka_dist",
+      "addressEn": "Avenue Tower, Level 3, Gulshan-1, Dhaka",
+      "addressBn": "অ্যাভিনিউ টাওয়ার, লেভেল ৩, গুলশান-১, ঢাকা",
+      "phone": "+8801700998822",
+      "operatingHours": "11:00 AM - 8:30 PM (Closed Tues)",
+      "isActive": true
+    },
+    "hub_chattogram": {
+      "id": "hub_chattogram",
+      "nameEn": "SilkenDrift Collection Point — Agrabad",
+      "nameBn": "সিল্কেনড্রিফট কালেকশন পয়েন্ট — আগ্রাবাদ",
+      "division": "chattogram",
+      "district": "chattogram_dist",
+      "addressEn": "Jahan Building, 2nd Floor, Agrabad C/A, Chattogram",
+      "addressBn": "জাহান বিল্ডিং, ২য় তলা, আগ্রাবাদ বাণিজ্যিক এলাকা, চট্টগ্রাম",
+      "phone": "+8801700998833",
+      "operatingHours": "10:30 AM - 8:00 PM (Sat-Thu)",
+      "isActive": true
+    }
+  },
+  "coupons": {
+    "cp_silkspring": {
+      "id": "cp_silkspring",
+      "code": "SILKSPRING",
+      "descriptionEn": "10% festive discount on heritage sarees and menswear",
+      "descriptionBn": "ঐতিহ্যবাহী শাড়ি ও পাঞ্জাবিতে স্পেশাল ১০% উৎসব ছাড়",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "minOrderBDT": 3000,
+      "maxDiscountBDT": 1500,
+      "startDate": "2026-02-01",
+      "endDate": "2026-04-30",
+      "usageLimit": 500,
+      "usedCount": 84,
+      "isActive": true
+    },
+    "cp_welcome10": {
+      "id": "cp_welcome10",
+      "code": "WELCOME10",
+      "descriptionEn": "Flat ৳500 off on your first order above ৳3,000",
+      "descriptionBn": "প্রথম অর্ডারে ফ্ল্যাট ৫০০ টাকা ছাড় (ন্যূনতম ৳৩,০০০ অর্ডার)",
+      "discountType": "fixed",
+      "discountValue": 500,
+      "minOrderBDT": 3000,
+      "startDate": "2026-01-01",
+      "endDate": "2026-12-31",
+      "usageLimit": 1000,
+      "usedCount": 219,
+      "isActive": true
+    }
+  },
+  "banners": {
+    "ban_hero_01": {
+      "id": "ban_hero_01",
+      "titleEn": "Masterpieces of Pure Rajshahi Silk",
+      "titleBn": "খাঁটি রাজশাহী রেশম সিল্কের অনবদ্য সমাহার",
+      "subtitleEn": "Hand-spun mulberry silk sarees with exquisite real zari weaves.",
+      "subtitleBn": "শতবর্ষের ঐতিহ্যবাহী তাঁতে বোনা রেশমি শাড়ির মোহময় আভিজাত্য।",
+      "ctaTextEn": "Explore Collection",
+      "ctaTextBn": "কালেকশন দেখুন",
+      "linkUrl": "/shop?category=rajshahi-silk-sarees",
+      "imageUrl": "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=1600&q=85",
+      "placement": "hero",
+      "priority": 1,
+      "isActive": true
+    },
+    "ban_hero_02": {
+      "id": "ban_hero_02",
+      "titleEn": "Authentic UNESCO Heritage Dhakai Jamdani",
+      "titleBn": "বিশ্ব ঐতিহ্যবাহী খাঁটি ঢাকai জামদানি",
+      "subtitleEn": "Intricate 84-count motifs straight from master weavers of Shitalakhya.",
+      "subtitleBn": "শীতলক্ষ্যার তাঁতিদের হাত থেকে সরাসরি প্রতিটি সূক্ষ্ম সুতার বুনন।",
+      "ctaTextEn": "Shop Jamdani",
+      "ctaTextBn": "জামদানি শপ করুন",
+      "linkUrl": "/shop?category=dhakai-jamdani",
+      "imageUrl": "https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?auto=format&fit=crop&w=1600&q=85",
+      "placement": "hero",
+      "priority": 2,
+      "isActive": true
+    }
+  },
+  "supportTickets": {
+    "tkt_1001": {
+      "id": "tkt_1001",
+      "ticketNumber": "TKT-2602-098",
+      "customerName": "Dr. Farzana Yasmin",
+      "customerEmail": "farzana.y@example.com",
+      "customerPhone": "+8801715998877",
+      "subject": "Delivery timing inquiry for Gulshan order",
+      "category": "delivery",
+      "priority": "medium",
+      "status": "in_progress",
+      "assignedTo": "Customer Care Lead (Rahim)",
+      "messages": [
+        {
+          "id": "msg_1",
+          "senderId": "cust_farzana",
+          "senderName": "Dr. Farzana Yasmin",
+          "senderRole": "customer",
+          "message": "Can my order SD-260215-4819 be delivered tomorrow after 3 PM? I will be out for surgery before that.",
+          "createdAt": "2026-02-15T11:00:00Z"
+        },
+        {
+          "id": "msg_2",
+          "senderId": "staff_rahim",
+          "senderName": "Rahim (SilkenDrift Support)",
+          "senderRole": "staff",
+          "message": "Assalamu Alaikum Dr. Farzana. We have coordinated with our Pathao priority courier dispatch. Your parcel is scheduled for afternoon delivery between 3:30 PM - 5:00 PM.",
+          "createdAt": "2026-02-15T12:15:00Z"
+        }
+      ],
+      "createdAt": "2026-02-15T11:00:00Z",
+      "updatedAt": "2026-02-15T12:15:00Z"
+    }
+  },
+  "settings": {
+    "business": {
+      "id": "business",
+      "storeName": "SilkenDrift",
+      "logoUrl": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 80' width='320' height='80'%3E%3Cdefs%3E%3ClinearGradient id='goldG' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23e5c07b'/%3E%3Cstop offset='50%25' stop-color='%23c99a3e'/%3E%3Cstop offset='100%25' stop-color='%239e7220'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='8' y='14' width='52' height='52' rx='14' fill='url(%23goldG)'/%3E%3Ctext x='34' y='52' font-family='serif' font-weight='900' font-size='36' font-style='italic' fill='%23ffffff' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='74' y='46' font-family='serif' font-weight='700' font-size='26' fill='%231a0e08' letter-spacing='-0.5'%3ESilkenDrift%3C/text%3E%3Ctext x='75' y='61' font-family='sans-serif' font-weight='700' font-size='9' fill='%23c99a3e' letter-spacing='3'%3EHERITAGE SILK%3C/text%3E%3C/svg%3E",
+      "logoDarkUrl": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 80' width='320' height='80'%3E%3Cdefs%3E%3ClinearGradient id='goldGD' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23f3d790'/%3E%3Cstop offset='50%25' stop-color='%23d4af37'/%3E%3Cstop offset='100%25' stop-color='%23b38c22'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect x='8' y='14' width='52' height='52' rx='14' fill='url(%23goldGD)'/%3E%3Ctext x='34' y='52' font-family='serif' font-weight='900' font-size='36' font-style='italic' fill='%231a0e08' text-anchor='middle'%3ES%3C/text%3E%3Ctext x='74' y='46' font-family='serif' font-weight='700' font-size='26' fill='%23fef3c7' letter-spacing='-0.5'%3ESilkenDrift%3C/text%3E%3Ctext x='75' y='61' font-family='sans-serif' font-weight='700' font-size='9' fill='%23fbbf24' letter-spacing='3'%3EHERITAGE SILK%3C/text%3E%3C/svg%3E",
+      "faviconUrl": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%231a0e08'/%3E%3Cpath d='M32 10 L50 28 L32 54 L14 28 Z' fill='none' stroke='%23d4af37' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M32 16 L44 28 L32 46 L20 28 Z' fill='%23d4af37'/%3E%3Ccircle cx='32' cy='28' r='3.5' fill='%23ffffff'/%3E%3C/svg%3E",
+      "taglineEn": "Authentic Pure Silk & Heritage Apparel of Bangladesh",
+      "taglineBn": "খাঁটি সিল্ক ও ঐতিহ্যবাহী পোশাকের নির্ভরযোগ্য প্রতিষ্ঠান",
+      "phone": "+880 9612-SILKEN (745536)",
+      "email": "support@silkendrift.com",
+      "addressEn": "Level 4, SilkenDrift Tower, Plot 42, Road 7A, Dhanmondi, Dhaka-1209",
+      "addressBn": "লেভেল ৪, সিল্কেনড্রিফট টাওয়ার, প্লট ৪২, রোড ৭এ, ধানমন্ডি, ঢাকা-১২০৯",
+      "vatRatePercent": 0,
+      "defaultCurrency": "BDT",
+      "codMaxAmountBDT": 15000,
+      "freeShippingMinBDT": 2500,
+      "insideDhakaChargeBDT": 60,
+      "outsideDhakaChargeBDT": 120,
+      "bKashMerchantNumber": "017XXXXXXXX",
+      "sslStoreId": "silkendrift_live",
+      "defaultLanguage": "bn",
+      "defaultTheme": "light"
+    }
+  }
+}
