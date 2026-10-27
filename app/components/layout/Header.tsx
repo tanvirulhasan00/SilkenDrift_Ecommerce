@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 
 export const Header: React.FC = () => {
-  const { language, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { user, isManager, isDemo, role, logout } = useAuth();
   const { settings } = useSettings();
   const [logoError, setLogoError] = useState(false);
@@ -77,9 +77,9 @@ export const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-silk-200 dark:bg-dark-surface/90 dark:border-dark-border transition-colors">
       {/* Top announcement bar */}
-      <div className="bg-silk-950 text-silk-100 text-[11px] py-1.5 px-4 dark:bg-black dark:text-silk-200">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
+      <div className="bg-silk-950 text-silk-100 text-[11px] py-1.5 px-3 sm:px-4 dark:bg-black dark:text-silk-200">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             <Sparkles className="w-3.5 h-3.5 text-gold-400 shrink-0" />
             <span className="truncate">
               {language === "bn"
@@ -88,8 +88,18 @@ export const Header: React.FC = () => {
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-4 text-silk-300 shrink-0">
-            <span className="flex items-center gap-1">
+          <div className="flex items-center gap-2 sm:gap-4 text-silk-300 shrink-0">
+            {/* Quick mobile language toggle */}
+            <button
+              type="button"
+              onClick={() => setLanguage(language === "bn" ? "en" : "bn")}
+              className="sm:hidden text-[10px] font-semibold text-gold-300 hover:text-white px-2 py-0.5 rounded bg-silk-900/80 border border-silk-800 transition"
+              aria-label="Switch Language"
+            >
+              {language === "bn" ? "ENG" : "বাংলা"}
+            </button>
+
+            <span className="hidden md:flex items-center gap-1">
               <PhoneCall className="w-3 h-3 text-gold-400" />
               <span>{settings.phone || "০৯৬১২-SILKEN"}</span>
             </span>
@@ -118,15 +128,15 @@ export const Header: React.FC = () => {
                 alt={settings.storeName || t.common.brandName}
                 referrerPolicy="no-referrer"
                 onError={() => setLogoError(true)}
-                className="h-8 sm:h-11 w-auto max-w-[130px] sm:max-w-[200px] object-contain transition-transform group-hover:scale-[1.02]"
+                className="h-8 sm:h-11 w-auto max-w-[120px] sm:max-w-[200px] object-contain transition-transform group-hover:scale-[1.02]"
               />
             ) : (
-              <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0">
                 <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-br from-gold-500 to-silk-900 flex items-center justify-center text-white shadow-soft shrink-0">
                   <span className="font-serif font-black text-lg sm:text-xl italic tracking-tighter">S</span>
                 </div>
                 <div className="min-w-0">
-                  <span className="text-lg sm:text-2xl font-serif font-bold tracking-tight text-silk-950 dark:text-silk-50 group-hover:text-gold-600 transition truncate block max-w-[120px] sm:max-w-none">
+                  <span className="text-base sm:text-2xl font-serif font-bold tracking-tight text-silk-950 dark:text-silk-50 group-hover:text-gold-600 transition truncate block max-w-[110px] sm:max-w-none">
                     {settings.storeName || t.common.brandName}
                   </span>
                   <span className="hidden sm:block text-[9px] uppercase tracking-widest text-gold-600 dark:text-gold-400 font-semibold truncate">
@@ -153,47 +163,64 @@ export const Header: React.FC = () => {
           </form>
 
           {/* Right Action Icons & Auth */}
-          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            <LanguageSwitcher />
-            <ThemeSwitcher />
+          <div className="flex items-center gap-1 sm:gap-2.5 shrink-0">
+            <div className="hidden sm:inline-flex shrink-0">
+              <LanguageSwitcher />
+            </div>
+            <div className="hidden sm:inline-flex shrink-0">
+              <ThemeSwitcher />
+            </div>
 
             {/* User Account / Login / Register Menu */}
             {!user ? (
-              <div className="hidden sm:flex items-center gap-2 text-xs font-semibold">
+              <>
+                {/* Mobile: Clean, unclipped profile icon linking to login */}
                 <Link
                   to="/login"
-                  className="px-3 py-1.5 rounded-xl border border-silk-300 hover:border-gold-500 text-silk-800 hover:text-silk-950 dark:border-dark-border dark:text-silk-300 dark:hover:text-white transition flex items-center gap-1.5"
+                  className="sm:hidden p-2 rounded-xl text-silk-700 hover:text-silk-950 hover:bg-silk-100 dark:text-silk-300 dark:hover:text-white dark:hover:bg-dark-elevated transition flex items-center justify-center shrink-0"
+                  aria-label="Sign In"
                 >
-                  <LogIn className="w-3.5 h-3.5 text-silk-600 dark:text-silk-400" />
-                  <span>Sign In</span>
+                  <User className="w-5 h-5" />
                 </Link>
-                <Link
-                  to="/register"
-                  className="px-3 py-1.5 rounded-xl bg-silk-900 text-white hover:bg-gold-500 hover:text-silk-950 dark:bg-gold-500 dark:text-silk-950 dark:hover:bg-gold-400 transition flex items-center gap-1"
-                >
-                  <UserPlus className="w-3.5 h-3.5" />
-                  <span>Register</span>
-                </Link>
-              </div>
+
+                {/* Desktop: Sign In / Register Buttons */}
+                <div className="hidden sm:flex items-center gap-2 text-xs font-semibold shrink-0">
+                  <Link
+                    to="/login"
+                    className="px-3 py-1.5 rounded-xl border border-silk-300 hover:border-gold-500 text-silk-800 hover:text-silk-950 dark:border-dark-border dark:text-silk-300 dark:hover:text-white transition flex items-center gap-1.5"
+                  >
+                    <LogIn className="w-3.5 h-3.5 text-silk-600 dark:text-silk-400" />
+                    <span>Sign In</span>
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-3 py-1.5 rounded-xl bg-silk-900 text-white hover:bg-gold-500 hover:text-silk-950 dark:bg-gold-500 dark:text-silk-950 dark:hover:bg-gold-400 transition flex items-center gap-1"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>Register</span>
+                  </Link>
+                </div>
+              </>
             ) : (
-              <div className="relative" ref={accountMenuRef}>
+              <div className="relative shrink-0" ref={accountMenuRef}>
                 <button
                   type="button"
                   onClick={() => setIsAccountMenuOpen(!isAccountMenuOpen)}
-                  className="flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-silk-200 hover:border-gold-500 bg-silk-50/70 hover:bg-silk-100 dark:border-dark-border dark:bg-dark-elevated dark:hover:bg-dark-surface transition"
+                  className="flex items-center gap-1.5 p-1.5 sm:px-3 sm:py-1.5 rounded-xl border border-silk-200 hover:border-gold-500 bg-silk-50/70 hover:bg-silk-100 dark:border-dark-border dark:bg-dark-elevated dark:hover:bg-dark-surface transition shrink-0"
+                  aria-label="User Account"
                 >
-                  <div className="w-6 h-6 rounded-full bg-gold-500/20 text-gold-600 flex items-center justify-center font-bold text-xs border border-gold-400/50">
-                    {user.displayName ? user.displayName.slice(0, 1).toUpperCase() : "U"}
+                  <div className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-gold-500/20 text-gold-600 dark:text-gold-400 flex items-center justify-center font-bold text-xs leading-none border border-gold-400/50 shrink-0">
+                    {user.displayName ? user.displayName.slice(0, 1).toUpperCase() : <User className="w-3.5 h-3.5" />}
                   </div>
                   <span className="hidden sm:inline text-xs font-semibold text-silk-900 dark:text-silk-100 max-w-[90px] truncate">
                     {user.displayName?.split(" ")[0]}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-silk-500 hidden sm:block" />
+                  <ChevronDown className="w-3.5 h-3.5 text-silk-500 hidden sm:block shrink-0" />
                 </button>
 
                 {/* Account Dropdown */}
                 {isAccountMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-2xl bg-white dark:bg-dark-surface border border-silk-200 dark:border-dark-border shadow-xl py-2 text-xs z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-24px)] rounded-2xl bg-white dark:bg-dark-surface border border-silk-200 dark:border-dark-border shadow-xl py-2 text-xs z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                     <div className="px-4 py-2 border-b border-silk-100 dark:border-dark-border">
                       <p className="font-bold text-silk-950 dark:text-silk-50 truncate">
                         {user.displayName}
@@ -374,6 +401,17 @@ export const Header: React.FC = () => {
             />
             <Search className="w-4 h-4 text-silk-400 absolute left-3 top-1/2 -translate-y-1/2" />
           </form>
+
+          {/* Mobile Language & Theme Preferences */}
+          <div className="flex items-center justify-between py-2 px-1 border-b border-silk-100 dark:border-dark-border">
+            <span className="text-xs font-semibold text-silk-600 dark:text-silk-400">
+              {language === "bn" ? "ভাষা ও থিম" : "Language & Theme"}
+            </span>
+            <div className="flex items-center gap-2">
+              <LanguageSwitcher />
+              <ThemeSwitcher />
+            </div>
+          </div>
 
           {/* Mobile Auth Bar */}
           {!user ? (

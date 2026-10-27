@@ -13,6 +13,8 @@ import {
   Send,
   Star,
   Quote,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 import { useToast } from "~/components/feedback/ToastContext";
@@ -36,6 +38,51 @@ export async function clientLoader() {
   };
 }
 
+const TESTIMONIALS = [
+  {
+    id: 1,
+    rating: 5,
+    quoteBn:
+      "পদ্মা গোল্ড জরি রাজশাহী সিল্ক শাড়িটি আমার বোনের বিয়ের জন্য নিয়েছিলাম। কাপড়ের কোমলতা ও সোনালি জরির ফিনিশিং চোখ জুড়ানো।",
+    quoteEn:
+      "Ordered the Padma Gold Zari Mulberry Silk saree for my sister's wedding. The drape, luster, and authenticity are unmatched.",
+    nameBn: "ফারহানা সুলতানা",
+    nameEn: "Farhana Sultana",
+    locationBn: "ধানমন্ডি, ঢাকা",
+    locationEn: "Dhanmondi, Dhaka",
+    verifiedBn: "যাচাইকৃত ক্রেতা",
+    verifiedEn: "Verified Buyer",
+  },
+  {
+    id: 2,
+    rating: 5,
+    quoteBn:
+      "এন্ডি সিল্কের পাঞ্জাবিটির কাটিং ও ফিটিংস নিখুঁত। সবচেয়ে ভালো লেগেছে বিকাশে ক্যাশব্যাকের সুবিধা এবং ২৪ ঘণ্টার মধ্যে দ্রুত ডেলিভারি।",
+    quoteEn:
+      "The Endi silk panjabi fit is impeccably tailored. Instant bKash checkout and rapid 24-hr doorstep delivery inside Dhaka.",
+    nameBn: "তানভীর হাসান",
+    nameEn: "Tanvir Hasan",
+    locationBn: "আগ্রাবাদ, চট্টগ্রাম",
+    locationEn: "Agrabad, Chattogram",
+    verifiedBn: "যাচাইকৃত ক্রেতা",
+    verifiedEn: "Verified Buyer",
+  },
+  {
+    id: 3,
+    rating: 5,
+    quoteBn:
+      "ঢাকাই জামদানি শাড়িতে শীতলক্ষ্যা পাড়ের নিখুঁত তেরছা জাল মোটিফ সত্যিই অসাধারণ। খাঁটি হস্তশিল্পের এমন কালেকশন সহজে মেলে না।",
+    quoteEn:
+      "The 84-count Dhakai Jamdani is pure museum-grade heritage. Authentic UNESCO handloom craft directly supporting rural weavers.",
+    nameBn: "রুবাইয়া নাসরিন",
+    nameEn: "Rubaiya Nasrin",
+    locationBn: "গুলশান, ঢাকা",
+    locationEn: "Gulshan, Dhaka",
+    verifiedBn: "যাচাইকৃত ক্রেতা",
+    verifiedEn: "Verified Buyer",
+  },
+];
+
 export default function HomePage() {
   const { categories, banners, flashDeals, newArrivals, bestSellers } =
     useLoaderData<typeof clientLoader>();
@@ -44,6 +91,79 @@ export default function HomePage() {
 
   const [newsletterInput, setNewsletterInput] = React.useState("");
   const heroBanner = banners[0];
+
+  const [currentReviewIndex, setCurrentReviewIndex] = React.useState(0);
+  const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = React.useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+    setTouchDeltaX(0);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX !== null) {
+      setTouchDeltaX(e.touches[0].clientX - touchStartX);
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (touchStartX !== null) {
+      if (touchDeltaX < -40) {
+        // Swiped left
+        setCurrentReviewIndex((prev) =>
+          prev < TESTIMONIALS.length - 1 ? prev + 1 : 0
+        );
+      } else if (touchDeltaX > 40) {
+        // Swiped right
+        setCurrentReviewIndex((prev) =>
+          prev > 0 ? prev - 1 : TESTIMONIALS.length - 1
+        );
+      }
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+  };
+
+  const handlePrevReview = () => {
+    setCurrentReviewIndex((prev) =>
+      prev > 0 ? prev - 1 : TESTIMONIALS.length - 1
+    );
+  };
+
+  const handleNextReview = () => {
+    setCurrentReviewIndex((prev) =>
+      prev < TESTIMONIALS.length - 1 ? prev + 1 : 0
+    );
+  };
+
+  const newArrivalsRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollNewArrivals = (direction: "left" | "right") => {
+    if (newArrivalsRef.current) {
+      const cardWidth =
+        newArrivalsRef.current.querySelector<HTMLElement>(":scope > div")
+          ?.offsetWidth || 280;
+      newArrivalsRef.current.scrollBy({
+        left: direction === "left" ? -(cardWidth + 16) : cardWidth + 16,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const bestSellersRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollBestSellers = (direction: "left" | "right") => {
+    if (bestSellersRef.current) {
+      const cardWidth =
+        bestSellersRef.current.querySelector<HTMLElement>(":scope > div")
+          ?.offsetWidth || 280;
+      bestSellersRef.current.scrollBy({
+        left: direction === "left" ? -(cardWidth + 16) : cardWidth + 16,
+        behavior: "smooth",
+      });
+    }
+  };
 
   const handleNewsletter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -187,12 +307,14 @@ export default function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {categories.map((cat) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {categories.slice(0, 4).map((cat, idx) => (
             <Link
               key={cat.id}
               to={`/shop?category=${cat.slug}`}
-              className="group relative rounded-2xl overflow-hidden aspect-[4/5] border border-silk-200 dark:border-dark-border shadow-card hover:shadow-soft transition-all duration-300"
+              className={`group relative rounded-2xl overflow-hidden aspect-[4/5] border border-silk-200 dark:border-dark-border shadow-card hover:shadow-soft transition-all duration-300 ${
+                idx >= 2 ? "hidden sm:block" : ""
+              }`}
             >
               <img
                 src={normalizeImageUrl(cat.imageUrl)}
@@ -251,9 +373,11 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-              {flashDeals.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+              {flashDeals.slice(0, 3).map((product, idx) => (
+                <div key={product.id} className={idx >= 2 ? "hidden sm:block" : ""}>
+                  <ProductCard product={product} />
+                </div>
               ))}
             </div>
           </div>
@@ -262,7 +386,7 @@ export default function HomePage() {
 
       {/* New Arrivals */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-silk-950 dark:text-silk-50">
               {t.home.newArrivals}
@@ -273,25 +397,59 @@ export default function HomePage() {
                 : "Freshly woven silk sarees, panjabis and seasonal heritage apparel"}
             </p>
           </div>
-          <Link
-            to="/shop?sort=newest"
-            className="text-xs sm:text-sm font-semibold text-gold-600 hover:text-gold-700 dark:text-gold-400 flex items-center gap-1"
-          >
-            <span>{t.common.viewAll}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {/* Slider Controls */}
+            <div className="flex items-center gap-1.5 mr-2">
+              <button
+                type="button"
+                onClick={() => scrollNewArrivals("left")}
+                className="p-2 rounded-full border border-silk-200 bg-white text-silk-700 hover:text-gold-600 hover:border-gold-400 dark:border-dark-border dark:bg-dark-elevated dark:text-silk-300 dark:hover:text-gold-400 shadow-sm transition active:scale-95"
+                aria-label="Previous new arrivals"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollNewArrivals("right")}
+                className="p-2 rounded-full border border-silk-200 bg-white text-silk-700 hover:text-gold-600 hover:border-gold-400 dark:border-dark-border dark:bg-dark-elevated dark:text-silk-300 dark:hover:text-gold-400 shadow-sm transition active:scale-95"
+                aria-label="Next new arrivals"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Link
+              to="/shop?sort=newest"
+              className="text-xs sm:text-sm font-semibold text-gold-600 hover:text-gold-700 dark:text-gold-400 flex items-center gap-1"
+            >
+              <span>{t.common.viewAll}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {newArrivals.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
+        {/* Product Slider (Max 4 items on mobile, max 6 on larger screens) */}
+        <div
+          ref={newArrivalsRef}
+          className="flex overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory scroll-px-4 sm:scroll-px-0 gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
+          {newArrivals.slice(0, 6).map((product, idx) => (
+            <div
+              key={product.id}
+              className={`w-[72vw] max-w-[280px] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] shrink-0 snap-start ${
+                idx >= 4 ? "hidden sm:block" : ""
+              }`}
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       </section>
 
       {/* Best Sellers */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-end justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 sm:mb-8">
           <div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-silk-950 dark:text-silk-50">
               {t.home.bestSellers}
@@ -302,18 +460,50 @@ export default function HomePage() {
                 : "Customer favorites with the highest verified reviews across Bangladesh"}
             </p>
           </div>
-          <Link
-            to="/shop?sort=best_selling"
-            className="text-xs sm:text-sm font-semibold text-gold-600 hover:text-gold-700 dark:text-gold-400 flex items-center gap-1"
-          >
-            <span>{t.common.viewAll}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto">
+            {/* Slider Controls */}
+            <div className="flex items-center gap-1.5 mr-2">
+              <button
+                type="button"
+                onClick={() => scrollBestSellers("left")}
+                className="p-2 rounded-full border border-silk-200 bg-white text-silk-700 hover:text-gold-600 hover:border-gold-400 dark:border-dark-border dark:bg-dark-elevated dark:text-silk-300 dark:hover:text-gold-400 shadow-sm transition active:scale-95"
+                aria-label="Previous best sellers"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollBestSellers("right")}
+                className="p-2 rounded-full border border-silk-200 bg-white text-silk-700 hover:text-gold-600 hover:border-gold-400 dark:border-dark-border dark:bg-dark-elevated dark:text-silk-300 dark:hover:text-gold-400 shadow-sm transition active:scale-95"
+                aria-label="Next best sellers"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+
+            <Link
+              to="/shop?sort=best_selling"
+              className="text-xs sm:text-sm font-semibold text-gold-600 hover:text-gold-700 dark:text-gold-400 flex items-center gap-1"
+            >
+              <span>{t.common.viewAll}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {bestSellers.slice(0, 4).map((product) => (
-            <ProductCard key={product.id} product={product} />
+        {/* Best Sellers Slider (fits 1 item card on smaller screen) */}
+        <div
+          ref={bestSellersRef}
+          className="flex overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory scroll-px-4 sm:scroll-px-0 gap-4 sm:gap-6 pb-4 -mx-4 px-4 sm:mx-0 sm:px-0"
+        >
+          {bestSellers.slice(0, 8).map((product) => (
+            <div
+              key={product.id}
+              className="w-[calc(100vw-32px)] sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] shrink-0 snap-start"
+            >
+              <ProductCard product={product} />
+            </div>
           ))}
         </div>
       </section>
@@ -332,93 +522,122 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-gold-500 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-gold-500" />
-                  ))}
-                </div>
-                <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
-                <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
-                  {language === "bn"
-                    ? "পদ্মা গোল্ড জরি রাজশাহী সিল্ক শাড়িটি আমার বোনের বিয়ের জন্য নিয়েছিলাম। কাপড়ের কোমলতা ও সোনালি জরির ফিনিশিং চোখ জুড়ানো।"
-                    : "Ordered the Padma Gold Zari Mulberry Silk saree for my sister's wedding. The drape, luster, and authenticity are unmatched."}
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
-                    {language === "bn" ? "ফারহানা সুলতানা" : "Farhana Sultana"}
-                  </h4>
-                  <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
-                    {language === "bn" ? "ধানমন্ডি, ঢাকা" : "Dhanmondi, Dhaka"}
-                  </span>
-                </div>
-                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
-                  {language === "bn" ? "যাচাইকৃত ক্রেতা" : "Verified Buyer"}
-                </span>
-              </div>
-            </div>
-
-            <div className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-gold-500 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-gold-500" />
-                  ))}
-                </div>
-                <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
-                <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
-                  {language === "bn"
-                    ? "এন্ডি সিল্কের পাঞ্জাবিটির কাটিং ও ফিটিংস নিখুঁত। সবচেয়ে ভালো লেগেছে বিকাশে ক্যাশব্যাকের সুবিধা এবং ২৪ ঘণ্টার মধ্যে দ্রুত ডেলিভারি।"
-                    : "The Endi silk panjabi fit is impeccably tailored. Instant bKash checkout and rapid 24-hr doorstep delivery inside Dhaka."}
-                </p>
-              </div>
-              <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
-                <div>
-                  <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
-                    {language === "bn" ? "তানভীর হাসান" : "Tanvir Hasan"}
-                  </h4>
-                  <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
-                    {language === "bn" ? "আগ্রাবাদ, চট্টগ্রাম" : "Agrabad, Chattogram"}
-                  </span>
-                </div>
-                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
-                  {language === "bn" ? "যাচাইকৃত ক্রেতা" : "Verified Buyer"}
-                </span>
+          {/* Mobile View: Customer Review Slider (< md) */}
+          <div className="md:hidden">
+            <div
+              className="relative overflow-hidden rounded-2xl"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <div
+                className="flex transition-transform duration-300 ease-out"
+                style={{ transform: `translateX(-${currentReviewIndex * 100}%)` }}
+              >
+                {TESTIMONIALS.map((item) => (
+                  <div key={item.id} className="w-full flex-shrink-0 px-1">
+                    <div className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between min-h-[220px]">
+                      <div>
+                        <div className="flex items-center gap-1 text-gold-500 mb-3">
+                          {Array.from({ length: item.rating }).map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-gold-500" />
+                          ))}
+                        </div>
+                        <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
+                        <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
+                          {language === "bn" ? item.quoteBn : item.quoteEn}
+                        </p>
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
+                        <div>
+                          <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
+                            {language === "bn" ? item.nameBn : item.nameEn}
+                          </h4>
+                          <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
+                            {language === "bn" ? item.locationBn : item.locationEn}
+                          </span>
+                        </div>
+                        <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
+                          {language === "bn" ? item.verifiedBn : item.verifiedEn}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between">
-              <div>
-                <div className="flex items-center gap-1 text-gold-500 mb-3">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-gold-500" />
-                  ))}
-                </div>
-                <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
-                <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
-                  {language === "bn"
-                    ? "ঢাকাই জামদানি শাড়িতে শীতলক্ষ্যা পাড়ের নিখুঁত তেরছা জাল মোটিফ সত্যিই অসাধারণ। খাঁটি হস্তশিল্পের এমন কালেকশন সহজে মেলে না।"
-                    : "The 84-count Dhakai Jamdani is pure museum-grade heritage. Authentic UNESCO handloom craft directly supporting rural weavers."}
-                </p>
+            {/* Mobile Slider Controls */}
+            <div className="flex items-center justify-between mt-5 px-1">
+              <button
+                type="button"
+                onClick={handlePrevReview}
+                className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 active:scale-95 transition"
+                aria-label="Previous review"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              <div className="flex items-center gap-2">
+                {TESTIMONIALS.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setCurrentReviewIndex(idx)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      currentReviewIndex === idx
+                        ? "w-6 bg-gold-500"
+                        : "w-2 bg-silk-300 dark:bg-silk-700"
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
               </div>
-              <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
+
+              <button
+                type="button"
+                onClick={handleNextReview}
+                className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 active:scale-95 transition"
+                aria-label="Next review"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Desktop View: Grid (>= md) */}
+          <div className="hidden md:grid md:grid-cols-3 gap-6">
+            {TESTIMONIALS.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between"
+              >
                 <div>
-                  <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
-                    {language === "bn" ? "রুবাইয়া নাসরিন" : "Rubaiya Nasrin"}
-                  </h4>
-                  <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
-                    {language === "bn" ? "গুলশান, ঢাকা" : "Gulshan, Dhaka"}
+                  <div className="flex items-center gap-1 text-gold-500 mb-3">
+                    {Array.from({ length: item.rating }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-gold-500" />
+                    ))}
+                  </div>
+                  <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
+                  <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
+                    {language === "bn" ? item.quoteBn : item.quoteEn}
+                  </p>
+                </div>
+                <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
+                      {language === "bn" ? item.nameBn : item.nameEn}
+                    </h4>
+                    <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
+                      {language === "bn" ? item.locationBn : item.locationEn}
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
+                    {language === "bn" ? item.verifiedBn : item.verifiedEn}
                   </span>
                 </div>
-                <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
-                  {language === "bn" ? "যাচাইকৃত ক্রেতা" : "Verified Buyer"}
-                </span>
               </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
