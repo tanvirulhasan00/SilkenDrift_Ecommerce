@@ -570,6 +570,7 @@ export default function AdminSettingsPage() {
                 type="password"
                 placeholder="BKASH_APP_KEY_XXXX"
                 value="••••••••••••••••••••"
+                showPasswordToggle={false}
                 readOnly
               />
             </div>
@@ -592,6 +593,7 @@ export default function AdminSettingsPage() {
                 type="password"
                 placeholder="SSL_STORE_PASSWORD_XXXX"
                 value="••••••••••••••••••••"
+                showPasswordToggle={false}
                 readOnly
               />
             </div>

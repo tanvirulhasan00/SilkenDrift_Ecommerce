@@ -101,7 +101,7 @@ export default function LoginPage() {
               required
               value={customerPassword}
               onChange={(e) => setCustomerPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder={language === "bn" ? "পাসওয়ার্ড লিখুন" : "Enter your password"}
               leftIcon={<Lock className="w-4 h-4" />}
             />
 

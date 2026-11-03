@@ -11,7 +11,6 @@ import {
   ShieldCheck,
   Lock,
   Mail,
-  KeyRound,
   Sparkles,
   ArrowRight,
   LayoutDashboard,
@@ -39,7 +38,6 @@ export default function StaffPortalPage() {
   // Staff Credentials Form
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [passkey, setPasskey] = useState("sd88");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -49,7 +47,7 @@ export default function StaffPortalPage() {
     setIsLoading(true);
 
     try {
-      const res = await loginRealUser(email, password, passkey);
+      const res = await loginRealUser(email, password);
       if (res.success) {
         if (res.user?.role === "customer") {
           setErrorMessage("Customer accounts cannot access the staff portal. Please use staff credentials.");
@@ -79,7 +77,6 @@ export default function StaffPortalPage() {
   const handlePresetFill = (presetEmail: string, presetPass: string) => {
     setEmail(presetEmail);
     setPassword(presetPass);
-    setPasskey("sd88");
   };
 
   return (
@@ -282,19 +279,8 @@ export default function StaffPortalPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Enter staff password"
                   leftIcon={<Lock className="w-4 h-4" />}
-                  className="bg-silk-950/80 border-silk-800 text-silk-100 placeholder:text-silk-600 focus:border-gold-500"
-                />
-
-                <Input
-                  label="Vault Passkey"
-                  type="password"
-                  value={passkey}
-                  onChange={(e) => setPasskey(e.target.value)}
-                  placeholder="Passkey (default: sd88)"
-                  leftIcon={<KeyRound className="w-4 h-4" />}
-                  helperText="Secondary verification barrier for HQ protection"
                   className="bg-silk-950/80 border-silk-800 text-silk-100 placeholder:text-silk-600 focus:border-gold-500"
                 />
 

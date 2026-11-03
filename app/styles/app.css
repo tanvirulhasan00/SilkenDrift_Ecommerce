@@ -35,6 +35,12 @@
     overflow-x: hidden;
   }
 
+  /* Prevent browser native password reveal duplicate icons on Windows (Edge / IE) */
+  input::-ms-reveal,
+  input::-ms-clear {
+    display: none !important;
+  }
+
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);

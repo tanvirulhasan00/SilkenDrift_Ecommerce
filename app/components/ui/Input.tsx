@@ -71,8 +71,15 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {canTogglePassword ? (
             <button
               type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-3 p-1 rounded-md text-silk-500 hover:text-gold-600 dark:text-silk-400 dark:hover:text-gold-400 transition-colors focus:outline-none focus:ring-1 focus:ring-gold-500/50"
+              onMouseDown={(e) => {
+                e.preventDefault();
+              }}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowPassword((prev) => !prev);
+              }}
+              className="absolute right-3 z-20 p-1 rounded-md text-silk-500 hover:text-gold-600 dark:text-silk-400 dark:hover:text-gold-400 transition-colors focus:outline-none focus:ring-1 focus:ring-gold-500/50 cursor-pointer"
               title={showPassword ? "Hide password" : "Show password"}
               aria-label={showPassword ? "Hide password" : "Show password"}
               tabIndex={-1}
