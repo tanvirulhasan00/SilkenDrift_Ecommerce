@@ -6,6 +6,7 @@ import { formatPriceBDT } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { Input } from "~/components/ui/Input";
 import { useToast } from "~/components/feedback/ToastContext";
 import { DeliveryZone, PickupPoint } from "~/types";
@@ -58,6 +59,10 @@ export default function AdminDeliveryPage() {
   const [pointDistrict, setPointDistrict] = useState("Dhaka");
   const [pointPhone, setPointPhone] = useState("+8801");
   const [pointHours, setPointHours] = useState("10:00 AM - 8:00 PM (Daily)");
+
+  // Deletion modal states
+  const [zoneToDelete, setZoneToDelete] = useState<DeliveryZone | null>(null);
+  const [pointToDelete, setPointToDelete] = useState<PickupPoint | null>(null);
 
   // ==========================================
   // ZONE CRUD HANDLERS
@@ -119,12 +124,16 @@ export default function AdminDeliveryPage() {
     setIsZoneModalOpen(false);
   };
 
-  const handleDeleteZone = (id: string) => {
-    if (confirm("Delete this delivery zone?")) {
-      mockRepository.deleteDeliveryZone(id);
-      setZones(zones.filter((z) => z.id !== id));
-      showToast("Delivery zone removed", "info");
-    }
+  const handleConfirmDeleteZone = () => {
+    if (!zoneToDelete) return;
+    const id = zoneToDelete.id;
+    mockRepository.deleteDeliveryZone(id);
+    setZones(zones.filter((z) => z.id !== id));
+    showToast(
+      language === "bn" ? "ডেলিভারি জোন মুছে ফেলা হয়েছে" : "Delivery zone removed",
+      "info"
+    );
+    setZoneToDelete(null);
   };
 
   // ==========================================
@@ -182,12 +191,16 @@ export default function AdminDeliveryPage() {
     setIsPointModalOpen(false);
   };
 
-  const handleDeletePoint = (id: string) => {
-    if (confirm("Delete this collection hub?")) {
-      mockRepository.deletePickupPoint(id);
-      setPickupPoints(pickupPoints.filter((p) => p.id !== id));
-      showToast("Pickup hub removed", "info");
-    }
+  const handleConfirmDeletePoint = () => {
+    if (!pointToDelete) return;
+    const id = pointToDelete.id;
+    mockRepository.deletePickupPoint(id);
+    setPickupPoints(pickupPoints.filter((p) => p.id !== id));
+    showToast(
+      language === "bn" ? "পিকআপ হাব মুছে ফেলা হয়েছে" : "Pickup hub removed",
+      "info"
+    );
+    setPointToDelete(null);
   };
 
   return (
@@ -320,7 +333,7 @@ export default function AdminDeliveryPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteZone(z.id)}
+                        onClick={() => setZoneToDelete(z)}
                         className="p-1.5 rounded-lg border border-silk-200 hover:border-rose-400 hover:bg-rose-50 text-silk-400 hover:text-rose-600 dark:border-dark-border transition"
                         title="Delete Zone"
                       >
@@ -382,7 +395,7 @@ export default function AdminDeliveryPage() {
                   size="sm"
                   variant="ghost"
                   className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                  onClick={() => handleDeletePoint(pp.id)}
+                  onClick={() => setPointToDelete(pp)}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
@@ -545,6 +558,48 @@ export default function AdminDeliveryPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Delivery Zone Modal */}
+      {zoneToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(zoneToDelete)}
+          onClose={() => setZoneToDelete(null)}
+          onConfirm={handleConfirmDeleteZone}
+          title={language === "bn" ? "ডেলিভারি জোন মুছবেন?" : "Delete Delivery Zone?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${zoneToDelete.nameBn || zoneToDelete.nameEn}" ডেলিভারি জোনটি মুছে ফেলতে চান?`
+              : `Are you sure you want to delete delivery zone "${zoneToDelete.nameEn}"?`
+          }
+          itemPreview={
+            <div className="flex items-center justify-between text-xs">
+              <span>Standard Rate: {formatPriceBDT(zoneToDelete.standardChargeBDT, language)}</span>
+              <span>Districts: {zoneToDelete.districts.slice(0, 3).join(", ")}...</span>
+            </div>
+          }
+        />
+      )}
+
+      {/* Delete Collection Hub Modal */}
+      {pointToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(pointToDelete)}
+          onClose={() => setPointToDelete(null)}
+          onConfirm={handleConfirmDeletePoint}
+          title={language === "bn" ? "পিকআপ হাব মুছবেন?" : "Delete Pickup Point?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${pointToDelete.nameBn || pointToDelete.nameEn}" পিকআপ পয়েন্টটি মুছে ফেলতে চান?`
+              : `Are you sure you want to delete collection hub "${pointToDelete.nameEn}"?`
+          }
+          itemPreview={
+            <div className="space-y-0.5 text-xs">
+              <p className="font-semibold">{pointToDelete.addressEn}</p>
+              <p className="text-silk-500">{pointToDelete.operatingHours} • Phone: {pointToDelete.phone}</p>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }

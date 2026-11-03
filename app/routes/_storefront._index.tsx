@@ -15,12 +15,15 @@ import {
   Quote,
   ChevronLeft,
   ChevronRight,
+  CheckCircle2,
 } from "lucide-react";
 import { normalizeImageUrl, getGoogleDriveFallbackUrls } from "~/lib/imageUrl";
 import { useToast } from "~/components/feedback/ToastContext";
+import type { ReviewItem } from "~/types";
 
 export async function clientLoader() {
   const products = await firestoreService.getProducts();
+  const reviews = await firestoreService.getReviews();
   const categories = mockRepository.getCategories();
   const banners = mockRepository.getBanners();
 
@@ -35,68 +38,97 @@ export async function clientLoader() {
     flashDeals,
     newArrivals,
     bestSellers,
+    reviews,
   };
 }
 
-const TESTIMONIALS = [
-  {
-    id: 1,
-    rating: 5,
-    quoteBn:
-      "পদ্মা গোল্ড জরি রাজশাহী সিল্ক শাড়িটি আমার বোনের বিয়ের জন্য নিয়েছিলাম। কাপড়ের কোমলতা ও সোনালি জরির ফিনিশিং চোখ জুড়ানো।",
-    quoteEn:
-      "Ordered the Padma Gold Zari Mulberry Silk saree for my sister's wedding. The drape, luster, and authenticity are unmatched.",
-    nameBn: "ফারহানা সুলতানা",
-    nameEn: "Farhana Sultana",
-    locationBn: "ধানমন্ডি, ঢাকা",
-    locationEn: "Dhanmondi, Dhaka",
-    verifiedBn: "যাচাইকৃত ক্রেতা",
-    verifiedEn: "Verified Buyer",
-  },
-  {
-    id: 2,
-    rating: 5,
-    quoteBn:
-      "এন্ডি সিল্কের পাঞ্জাবিটির কাটিং ও ফিটিংস নিখুঁত। সবচেয়ে ভালো লেগেছে বিকাশে ক্যাশব্যাকের সুবিধা এবং ২৪ ঘণ্টার মধ্যে দ্রুত ডেলিভারি।",
-    quoteEn:
-      "The Endi silk panjabi fit is impeccably tailored. Instant bKash checkout and rapid 24-hr doorstep delivery inside Dhaka.",
-    nameBn: "তানভীর হাসান",
-    nameEn: "Tanvir Hasan",
-    locationBn: "আগ্রাবাদ, চট্টগ্রাম",
-    locationEn: "Agrabad, Chattogram",
-    verifiedBn: "যাচাইকৃত ক্রেতা",
-    verifiedEn: "Verified Buyer",
-  },
-  {
-    id: 3,
-    rating: 5,
-    quoteBn:
-      "ঢাকাই জামদানি শাড়িতে শীতলক্ষ্যা পাড়ের নিখুঁত তেরছা জাল মোটিফ সত্যিই অসাধারণ। খাঁটি হস্তশিল্পের এমন কালেকশন সহজে মেলে না।",
-    quoteEn:
-      "The 84-count Dhakai Jamdani is pure museum-grade heritage. Authentic UNESCO handloom craft directly supporting rural weavers.",
-    nameBn: "রুবাইয়া নাসরিন",
-    nameEn: "Rubaiya Nasrin",
-    locationBn: "গুলশান, ঢাকা",
-    locationEn: "Gulshan, Dhaka",
-    verifiedBn: "যাচাইকৃত ক্রেতা",
-    verifiedEn: "Verified Buyer",
-  },
-];
-
 export default function HomePage() {
-  const { categories, banners, flashDeals, newArrivals, bestSellers } =
-    useLoaderData<typeof clientLoader>();
+  const {
+    categories,
+    banners,
+    flashDeals,
+    newArrivals,
+    bestSellers,
+    reviews,
+  } = useLoaderData<typeof clientLoader>();
   const { language, t } = useLanguage();
   const { showToast } = useToast();
 
   const [newsletterInput, setNewsletterInput] = React.useState("");
   const heroBanner = banners[0];
 
+  // Filter 5-star approved reviews only, and randomize their display order
+  const [fiveStarReviews, setFiveStarReviews] = React.useState<ReviewItem[]>([]);
+  React.useEffect(() => {
+    const list = (reviews || []).filter(
+      (r) => r.rating === 5 && r.status === "approved"
+    );
+    // Fisher-Yates shuffle to randomize customer reviews
+    const shuffled = [...list];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const temp = shuffled[i];
+      shuffled[i] = shuffled[j];
+      shuffled[j] = temp;
+    }
+    setFiveStarReviews(shuffled);
+  }, [reviews]);
+
   const [currentReviewIndex, setCurrentReviewIndex] = React.useState(0);
+  const [isReviewPaused, setIsReviewPaused] = React.useState(false);
+  const [visibleCount, setVisibleCount] = React.useState(3);
+
+  // Responsive visible cards count
+  React.useEffect(() => {
+    const updateVisibleCount = () => {
+      if (typeof window !== "undefined") {
+        if (window.innerWidth < 640) {
+          setVisibleCount(1);
+        } else if (window.innerWidth < 1024) {
+          setVisibleCount(2);
+        } else {
+          setVisibleCount(3);
+        }
+      }
+    };
+    updateVisibleCount();
+    window.addEventListener("resize", updateVisibleCount);
+    return () => window.removeEventListener("resize", updateVisibleCount);
+  }, []);
+
+  const maxReviewIndex = Math.max(0, fiveStarReviews.length - visibleCount);
+
+  // Keep index within bounds if window resizes or reviews list changes
+  React.useEffect(() => {
+    if (currentReviewIndex > maxReviewIndex) {
+      setCurrentReviewIndex(maxReviewIndex);
+    }
+  }, [maxReviewIndex, currentReviewIndex]);
+
+  // Auto-slide carousel: advances every 4 seconds, pauses on hover / touch
+  React.useEffect(() => {
+    if (fiveStarReviews.length <= visibleCount || isReviewPaused) return;
+
+    const timer = setInterval(() => {
+      setCurrentReviewIndex((prev) => (prev >= maxReviewIndex ? 0 : prev + 1));
+    }, 4000);
+
+    return () => clearInterval(timer);
+  }, [fiveStarReviews.length, visibleCount, isReviewPaused, maxReviewIndex]);
+
+  const handlePrevReview = () => {
+    setCurrentReviewIndex((prev) => (prev > 0 ? prev - 1 : maxReviewIndex));
+  };
+
+  const handleNextReview = () => {
+    setCurrentReviewIndex((prev) => (prev < maxReviewIndex ? prev + 1 : 0));
+  };
+
   const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
   const [touchDeltaX, setTouchDeltaX] = React.useState(0);
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    setIsReviewPaused(true);
     setTouchStartX(e.touches[0].clientX);
     setTouchDeltaX(0);
   };
@@ -110,31 +142,16 @@ export default function HomePage() {
   const handleTouchEnd = () => {
     if (touchStartX !== null) {
       if (touchDeltaX < -40) {
-        // Swiped left
-        setCurrentReviewIndex((prev) =>
-          prev < TESTIMONIALS.length - 1 ? prev + 1 : 0
-        );
+        // Swiped left -> next
+        handleNextReview();
       } else if (touchDeltaX > 40) {
-        // Swiped right
-        setCurrentReviewIndex((prev) =>
-          prev > 0 ? prev - 1 : TESTIMONIALS.length - 1
-        );
+        // Swiped right -> prev
+        handlePrevReview();
       }
     }
     setTouchStartX(null);
     setTouchDeltaX(0);
-  };
-
-  const handlePrevReview = () => {
-    setCurrentReviewIndex((prev) =>
-      prev > 0 ? prev - 1 : TESTIMONIALS.length - 1
-    );
-  };
-
-  const handleNextReview = () => {
-    setCurrentReviewIndex((prev) =>
-      prev < TESTIMONIALS.length - 1 ? prev + 1 : 0
-    );
+    setIsReviewPaused(false);
   };
 
   const newArrivalsRef = React.useRef<HTMLDivElement>(null);
@@ -508,137 +525,166 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials Showcase */}
       <section className="bg-silk-100/60 dark:bg-dark-surface/60 py-16 border-y border-silk-200/80 dark:border-dark-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-100/80 text-gold-800 dark:bg-gold-950/40 dark:text-gold-300 text-xs font-semibold mb-3">
+              <Star className="w-3.5 h-3.5 fill-gold-500 text-gold-500" />
+              <span>{language === "bn" ? "গ্রাহক রিভিউ" : "Customer Reviews"}</span>
+            </div>
             <h2 className="text-2xl sm:text-3xl font-serif font-bold text-silk-950 dark:text-silk-50">
               {t.home.testimonialsTitle}
             </h2>
             <p className="text-xs sm:text-sm text-silk-600 dark:text-silk-400 mt-2">
               {language === "bn"
-                ? "সারা বাংলাদেশের সন্তুষ্ট ক্রেতাদের মতামত"
-                : "Real experiences from patrons who value genuine Bengal handloom"}
+                ? "সারা বাংলাদেশের সন্তুষ্ট ক্রেতাদের খাঁটি সিল্ক ও তাঁত শিল্পের অনুভূতি"
+                : "Real experiences from patrons who value authentic Bengal handloom"}
             </p>
           </div>
 
-          {/* Mobile View: Customer Review Slider (< md) */}
-          <div className="md:hidden">
+          {/* Empty State: If there are no 5-star reviews */}
+          {fiveStarReviews.length === 0 ? (
+            <div className="text-center py-12 px-6 rounded-3xl bg-white dark:bg-dark-elevated border border-silk-200/80 dark:border-dark-border max-w-xl mx-auto shadow-sm">
+              <div className="w-14 h-14 mx-auto rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-500 dark:text-amber-400 flex items-center justify-center mb-4 shadow-xs">
+                <Star className="w-7 h-7 text-amber-500/70" />
+              </div>
+              <h3 className="text-lg font-serif font-bold text-silk-900 dark:text-silk-100">
+                {language === "bn" ? "এখনও কোন রিভিউ নেই" : "No review yet"}
+              </h3>
+              <p className="text-xs text-silk-600 dark:text-silk-400 mt-1.5 max-w-sm mx-auto">
+                {language === "bn"
+                  ? "আমাদের সিল্ক ও তাঁতের পণ্য ব্যবহার করে আপনার মূল্যবান মতামত দিন।"
+                  : "Be the first to share your 5-star experience with our handcrafted Bengal silks."}
+              </p>
+            </div>
+          ) : (
+            /* Auto-Slider Carousel */
             <div
-              className="relative overflow-hidden rounded-2xl"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
+              className="relative"
+              onMouseEnter={() => setIsReviewPaused(true)}
+              onMouseLeave={() => setIsReviewPaused(false)}
             >
               <div
-                className="flex transition-transform duration-300 ease-out"
-                style={{ transform: `translateX(-${currentReviewIndex * 100}%)` }}
+                className="overflow-hidden rounded-2xl -mx-2.5 sm:-mx-3 px-2.5 sm:px-3 py-2"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
-                {TESTIMONIALS.map((item) => (
-                  <div key={item.id} className="w-full flex-shrink-0 px-1">
-                    <div className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between min-h-[220px]">
-                      <div>
-                        <div className="flex items-center gap-1 text-gold-500 mb-3">
-                          {Array.from({ length: item.rating }).map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-gold-500" />
-                          ))}
-                        </div>
-                        <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
-                        <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
-                          {language === "bn" ? item.quoteBn : item.quoteEn}
-                        </p>
-                      </div>
-                      <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
+                <div
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{
+                    transform: `translateX(-${currentReviewIndex * (100 / visibleCount)}%)`,
+                  }}
+                >
+                  {fiveStarReviews.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex-shrink-0 px-2.5 sm:px-3"
+                      style={{ width: `${100 / visibleCount}%` }}
+                    >
+                      <div className="h-full rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between transition-all duration-300 hover:shadow-md">
                         <div>
-                          <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
-                            {language === "bn" ? item.nameBn : item.nameEn}
-                          </h4>
-                          <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
-                            {language === "bn" ? item.locationBn : item.locationEn}
-                          </span>
+                          {/* 5-Star Rating & Verified Badge */}
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center gap-1 text-gold-500">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className="w-4 h-4 fill-gold-500 text-gold-500"
+                                />
+                              ))}
+                            </div>
+                            {item.isVerifiedPurchase && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/60">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                                {language === "bn" ? "যাচাইকৃত ক্রেতা" : "Verified Buyer"}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Product Reference */}
+                          {item.productName && (
+                            <p className="text-[11px] font-medium text-gold-700 dark:text-gold-400 mb-2.5 truncate">
+                              {language === "bn" && item.productNameBn
+                                ? item.productNameBn
+                                : item.productName}
+                            </p>
+                          )}
+
+                          {/* Quote & Review Comment */}
+                          <Quote className="w-5 h-5 text-silk-300 dark:text-silk-600 mb-2 shrink-0" />
+                          <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic line-clamp-4">
+                            "{language === "bn" && item.commentBn ? item.commentBn : item.comment}"
+                          </p>
                         </div>
-                        <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
-                          {language === "bn" ? item.verifiedBn : item.verifiedEn}
-                        </span>
+
+                        {/* Customer Info Footer */}
+                        <div className="mt-5 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
+                          <div>
+                            <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
+                              {item.customerName}
+                            </h4>
+                            {(item.locationBn || item.locationEn) && (
+                              <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
+                                {language === "bn"
+                                  ? item.locationBn || item.locationEn
+                                  : item.locationEn || item.locationBn}
+                              </span>
+                            )}
+                          </div>
+                          {item.date && (
+                            <span className="text-[10px] text-silk-400 dark:text-silk-500 font-medium">
+                              {item.date}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Mobile Slider Controls */}
-            <div className="flex items-center justify-between mt-5 px-1">
-              <button
-                type="button"
-                onClick={handlePrevReview}
-                className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 active:scale-95 transition"
-                aria-label="Previous review"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-
-              <div className="flex items-center gap-2">
-                {TESTIMONIALS.map((_, idx) => (
+              {/* Slider Controls: Arrows and Dots */}
+              {fiveStarReviews.length > visibleCount && (
+                <div className="flex items-center justify-between mt-6 px-1">
                   <button
-                    key={idx}
                     type="button"
-                    onClick={() => setCurrentReviewIndex(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ${
-                      currentReviewIndex === idx
-                        ? "w-6 bg-gold-500"
-                        : "w-2 bg-silk-300 dark:bg-silk-700"
-                    }`}
-                    aria-label={`Go to slide ${idx + 1}`}
-                  />
-                ))}
-              </div>
+                    onClick={handlePrevReview}
+                    className="p-2.5 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-300 active:scale-95 transition"
+                    aria-label="Previous review"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
 
-              <button
-                type="button"
-                onClick={handleNextReview}
-                className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 active:scale-95 transition"
-                aria-label="Next review"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Desktop View: Grid (>= md) */}
-          <div className="hidden md:grid md:grid-cols-3 gap-6">
-            {TESTIMONIALS.map((item) => (
-              <div
-                key={item.id}
-                className="rounded-2xl bg-white p-6 shadow-card border border-silk-200/80 dark:bg-dark-elevated dark:border-dark-border flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center gap-1 text-gold-500 mb-3">
-                    {Array.from({ length: item.rating }).map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-gold-500" />
+                  <div className="flex items-center gap-1.5 flex-wrap justify-center max-w-[200px] sm:max-w-md">
+                    {Array.from({ length: maxReviewIndex + 1 }).map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setCurrentReviewIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentReviewIndex === idx
+                            ? "w-6 bg-gold-500"
+                            : "w-2 bg-silk-300 dark:bg-silk-700 hover:bg-gold-300"
+                        }`}
+                        aria-label={`Go to slide ${idx + 1}`}
+                      />
                     ))}
                   </div>
-                  <Quote className="w-6 h-6 text-silk-300 dark:text-silk-600 mb-2" />
-                  <p className="text-xs text-silk-700 dark:text-silk-300 leading-relaxed italic">
-                    {language === "bn" ? item.quoteBn : item.quoteEn}
-                  </p>
+
+                  <button
+                    type="button"
+                    onClick={handleNextReview}
+                    className="p-2.5 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-gold-600 dark:hover:text-gold-400 hover:border-gold-300 active:scale-95 transition"
+                    aria-label="Next review"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <div className="mt-4 pt-4 border-t border-silk-100 dark:border-dark-border flex items-center justify-between">
-                  <div>
-                    <h4 className="text-xs font-bold text-silk-900 dark:text-silk-100">
-                      {language === "bn" ? item.nameBn : item.nameEn}
-                    </h4>
-                    <span className="text-[10px] font-semibold text-silk-600 dark:text-silk-400">
-                      {language === "bn" ? item.locationBn : item.locationEn}
-                    </span>
-                  </div>
-                  <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full dark:bg-emerald-950/40">
-                    {language === "bn" ? item.verifiedBn : item.verifiedEn}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 

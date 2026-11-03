@@ -6,6 +6,7 @@ import { formatPriceBDT } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { Input } from "~/components/ui/Input";
 import { useToast } from "~/components/feedback/ToastContext";
 import { Coupon, Banner } from "~/types";
@@ -59,6 +60,10 @@ export default function AdminMarketingPage() {
   const [bannerImage, setBannerImage] = useState("");
   const [bannerLink, setBannerLink] = useState("/shop");
   const [bannerPriority, setBannerPriority] = useState<number>(1);
+
+  // Deletion modal states
+  const [couponToDelete, setCouponToDelete] = useState<Coupon | null>(null);
+  const [bannerToDelete, setBannerToDelete] = useState<Banner | null>(null);
 
   // ==========================================
   // COUPON CRUD
@@ -114,12 +119,16 @@ export default function AdminMarketingPage() {
     setIsCouponModalOpen(false);
   };
 
-  const handleDeleteCoupon = (id: string) => {
-    if (confirm("Delete this coupon code?")) {
-      mockRepository.deleteCoupon(id);
-      setCoupons(coupons.filter((c) => c.id !== id));
-      showToast("Coupon removed", "info");
-    }
+  const handleConfirmDeleteCoupon = () => {
+    if (!couponToDelete) return;
+    const id = couponToDelete.id;
+    mockRepository.deleteCoupon(id);
+    setCoupons(coupons.filter((c) => c.id !== id));
+    showToast(
+      language === "bn" ? "কুপন মুছে ফেলা হয়েছে" : "Coupon removed",
+      "info"
+    );
+    setCouponToDelete(null);
   };
 
   // ==========================================
@@ -175,12 +184,16 @@ export default function AdminMarketingPage() {
     setIsBannerModalOpen(false);
   };
 
-  const handleDeleteBanner = (id: string) => {
-    if (confirm("Delete this campaign banner?")) {
-      mockRepository.deleteBanner(id);
-      setBanners(banners.filter((b) => b.id !== id));
-      showToast("Banner deleted", "info");
-    }
+  const handleConfirmDeleteBanner = () => {
+    if (!bannerToDelete) return;
+    const id = bannerToDelete.id;
+    mockRepository.deleteBanner(id);
+    setBanners(banners.filter((b) => b.id !== id));
+    showToast(
+      language === "bn" ? "ব্যানার মুছে ফেলা হয়েছে" : "Banner deleted",
+      "info"
+    );
+    setBannerToDelete(null);
   };
 
   return (
@@ -271,7 +284,7 @@ export default function AdminMarketingPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteCoupon(c.id)}
+                        onClick={() => setCouponToDelete(c)}
                         className="p-1.5 rounded-lg border border-silk-200 hover:border-rose-400 hover:bg-rose-50 text-silk-400 hover:text-rose-600 dark:border-dark-border transition"
                         title="Delete Coupon"
                       >
@@ -349,7 +362,7 @@ export default function AdminMarketingPage() {
                   size="sm"
                   variant="ghost"
                   className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                  onClick={() => handleDeleteBanner(b.id)}
+                  onClick={() => setBannerToDelete(b)}
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </Button>
@@ -505,6 +518,48 @@ export default function AdminMarketingPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Delete Coupon Modal */}
+      {couponToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(couponToDelete)}
+          onClose={() => setCouponToDelete(null)}
+          onConfirm={handleConfirmDeleteCoupon}
+          title={language === "bn" ? "কুপন মুছবেন?" : "Delete Coupon?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${couponToDelete.code}" প্রোমো কুপন কোডটি মুছে ফেলতে চান?`
+              : `Are you sure you want to delete promo coupon code "${couponToDelete.code}"?`
+          }
+          itemPreview={
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-mono font-bold">{couponToDelete.code}</span>
+              <span>{couponToDelete.discountType === "percentage" ? `${couponToDelete.discountValue}% OFF` : `BDT ${couponToDelete.discountValue} OFF`}</span>
+            </div>
+          }
+        />
+      )}
+
+      {/* Delete Banner Modal */}
+      {bannerToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(bannerToDelete)}
+          onClose={() => setBannerToDelete(null)}
+          onConfirm={handleConfirmDeleteBanner}
+          title={language === "bn" ? "ব্যানার মুছবেন?" : "Delete Campaign Banner?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${bannerToDelete.titleBn || bannerToDelete.titleEn}" হিরো ব্যানারটি মুছে ফেলতে চান?`
+              : `Are you sure you want to delete hero banner "${bannerToDelete.titleEn}"?`
+          }
+          itemPreview={
+            <div className="space-y-1 text-xs">
+              <p className="font-semibold">{bannerToDelete.titleEn}</p>
+              <p className="text-silk-500 font-mono text-[10px] truncate">{bannerToDelete.linkUrl}</p>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }

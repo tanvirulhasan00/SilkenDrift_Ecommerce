@@ -15,6 +15,7 @@ import {
   PickupPoint,
   Coupon,
   Banner,
+  ReviewItem,
 } from "~/types";
 import {
   SEED_PRODUCTS,
@@ -29,6 +30,7 @@ import {
   SEED_PICKUP_POINTS,
   SEED_COUPONS,
   SEED_BANNERS,
+  SEED_REVIEWS,
 } from "./seedData";
 import { generateOrderNumber, generateId } from "~/lib/utils";
 
@@ -74,6 +76,7 @@ class MockDataRepository {
   private pickupPoints: PickupPoint[] = [];
   private coupons: Coupon[] = [];
   private banners: Banner[] = [];
+  private reviews: ReviewItem[] = [];
   private settings: BusinessSettings = { ...SEED_SETTINGS };
   private initialized = false;
 
@@ -98,6 +101,7 @@ class MockDataRepository {
         const pp = localStorage.getItem("sd_mock_pickup_points");
         const cp = localStorage.getItem("sd_mock_coupons");
         const bn = localStorage.getItem("sd_mock_banners");
+        const rev = localStorage.getItem("sd_mock_reviews");
 
         this.products = p ? JSON.parse(p) : [...SEED_PRODUCTS];
         this.orders = o ? JSON.parse(o) : [...SEED_ORDERS];
@@ -111,6 +115,7 @@ class MockDataRepository {
         this.pickupPoints = pp ? JSON.parse(pp) : [...SEED_PICKUP_POINTS];
         this.coupons = cp ? JSON.parse(cp) : [...SEED_COUPONS];
         this.banners = bn ? JSON.parse(bn) : [...SEED_BANNERS];
+        this.reviews = rev ? JSON.parse(rev) : [...SEED_REVIEWS];
         if (set) {
           this.settings = { ...SEED_SETTINGS, ...JSON.parse(set) };
         }
@@ -153,6 +158,7 @@ class MockDataRepository {
     this.pickupPoints = [...SEED_PICKUP_POINTS];
     this.coupons = [...SEED_COUPONS];
     this.banners = [...SEED_BANNERS];
+    this.reviews = [...SEED_REVIEWS];
     this.settings = { ...SEED_SETTINGS };
     this.syncAllProductsVariantStock();
   }
@@ -715,6 +721,58 @@ class MockDataRepository {
   }
 
   // ==========================================
+  // REVIEWS CRUD
+  // ==========================================
+  getReviews(): ReviewItem[] {
+    return this.reviews;
+  }
+
+  getReviewById(id: string): ReviewItem | undefined {
+    return this.reviews.find((r) => r.id === id);
+  }
+
+  saveReview(review: ReviewItem): ReviewItem {
+    const idx = this.reviews.findIndex((r) => r.id === review.id);
+    if (idx > -1) {
+      this.reviews[idx] = review;
+    } else {
+      this.reviews.unshift(review);
+    }
+    this.persist("sd_mock_reviews", this.reviews);
+    return review;
+  }
+
+  deleteReview(id: string): boolean {
+    const idx = this.reviews.findIndex((r) => r.id === id);
+    if (idx > -1) {
+      this.reviews.splice(idx, 1);
+      this.persist("sd_mock_reviews", this.reviews);
+      return true;
+    }
+    return false;
+  }
+
+  deleteReviews(ids: string[]): boolean {
+    const idSet = new Set(ids);
+    const initialLen = this.reviews.length;
+    this.reviews = this.reviews.filter((r) => !idSet.has(r.id));
+    this.persist("sd_mock_reviews", this.reviews);
+    return this.reviews.length < initialLen;
+  }
+
+  updateReviewStatus(
+    id: string,
+    status: "approved" | "pending" | "rejected"
+  ): ReviewItem | undefined {
+    const review = this.reviews.find((r) => r.id === id);
+    if (review) {
+      review.status = status;
+      this.persist("sd_mock_reviews", this.reviews);
+    }
+    return review;
+  }
+
+  // ==========================================
   // SETTINGS & SYSTEM RESET
   // ==========================================
   getSettings(): BusinessSettings {
@@ -751,6 +809,7 @@ class MockDataRepository {
     this.persist("sd_mock_pickup_points", this.pickupPoints);
     this.persist("sd_mock_coupons", this.coupons);
     this.persist("sd_mock_banners", this.banners);
+    this.persist("sd_mock_reviews", this.reviews);
     this.persist("sd_mock_settings", this.settings);
   }
 }

@@ -347,6 +347,22 @@ export interface Banner {
   isActive: boolean;
 }
 
+export interface ReviewItem {
+  id: string;
+  productId?: string;
+  productName: string;
+  productNameBn?: string;
+  customerName: string;
+  locationEn?: string;
+  locationBn?: string;
+  rating: number; // 1 to 5
+  comment: string;
+  commentBn?: string;
+  date: string;
+  status: "approved" | "pending" | "rejected";
+  isVerifiedPurchase?: boolean;
+}
+
 export interface ProductReview {
   id: string;
   productId: string;

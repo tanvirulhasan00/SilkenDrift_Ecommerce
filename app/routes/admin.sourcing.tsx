@@ -6,6 +6,7 @@ import { useLanguage } from "~/locales";
 import { formatPriceBDT } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { Input } from "~/components/ui/Input";
 import { Badge } from "~/components/ui/Badge";
 import { useToast } from "~/components/feedback/ToastContext";
@@ -136,11 +137,29 @@ export default function AdminSourcingPage() {
     setIsSupplierModalOpen(false);
   };
 
-  const handleDeleteSupplier = async (id: string) => {
-    if (confirm("Are you sure you want to remove this supplier?")) {
+  // Single deletion modal states
+  const [supplierToDelete, setSupplierToDelete] = useState<Supplier | null>(null);
+  const [isDeletingSupplier, setIsDeletingSupplier] = useState(false);
+
+  const [receiptToDelete, setReceiptToDelete] = useState<SourcingRecord | null>(null);
+
+  const handleConfirmDeleteSupplier = async () => {
+    if (!supplierToDelete) return;
+    setIsDeletingSupplier(true);
+    try {
+      const id = supplierToDelete.id;
       await firestoreService.deleteSupplier(id);
       setSuppliers(suppliers.filter((s) => s.id !== id));
-      showToast("Supplier removed", "info");
+      showToast(
+        language === "bn" ? "সাপ্লায়ার মুছে ফেলা হয়েছে" : "Supplier removed",
+        "info"
+      );
+      setSupplierToDelete(null);
+    } catch (err) {
+      console.error("Delete supplier error:", err);
+      showToast("Failed to remove supplier", "error");
+    } finally {
+      setIsDeletingSupplier(false);
     }
   };
 
@@ -174,12 +193,16 @@ export default function AdminSourcingPage() {
     showToast("Goods received and central inventory updated!", "success");
   };
 
-  const handleDeleteReceipt = (id: string) => {
-    if (confirm("Delete this sourcing record?")) {
-      mockRepository.deleteSourcingRecord(id);
-      setSourcingRecords(sourcingRecords.filter((r) => r.id !== id));
-      showToast("Sourcing record deleted", "info");
-    }
+  const handleConfirmDeleteReceipt = () => {
+    if (!receiptToDelete) return;
+    const id = receiptToDelete.id;
+    mockRepository.deleteSourcingRecord(id);
+    setSourcingRecords(sourcingRecords.filter((r) => r.id !== id));
+    showToast(
+      language === "bn" ? "সোর্সিং রেকর্ড মুছে ফেলা হয়েছে" : "Sourcing record deleted",
+      "info"
+    );
+    setReceiptToDelete(null);
   };
 
   const filteredSuppliers = suppliers.filter(
@@ -335,7 +358,7 @@ export default function AdminSourcingPage() {
                     size="sm"
                     variant="ghost"
                     className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                    onClick={() => handleDeleteSupplier(s.id)}
+                    onClick={() => setSupplierToDelete(s)}
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
@@ -403,7 +426,7 @@ export default function AdminSourcingPage() {
                     <td className="py-3 px-4 text-right">
                       <button
                         type="button"
-                        onClick={() => handleDeleteReceipt(r.id)}
+                        onClick={() => setReceiptToDelete(r)}
                         className="p-1.5 text-silk-400 hover:text-rose-600 transition"
                         title="Delete Sourcing Record"
                       >
@@ -588,6 +611,51 @@ export default function AdminSourcingPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Supplier Deletion Modal */}
+      {supplierToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(supplierToDelete)}
+          onClose={() => !isDeletingSupplier && setSupplierToDelete(null)}
+          onConfirm={handleConfirmDeleteSupplier}
+          isLoading={isDeletingSupplier}
+          title={language === "bn" ? "সাপ্লায়ার মুছে ফেলবেন?" : "Remove Supplier?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${supplierToDelete.name}" সাপ্লায়ারকে মুছে ফেলতে চান?`
+              : `Are you sure you want to remove supplier "${supplierToDelete.name}"?`
+          }
+          itemPreview={
+            <div className="flex items-center justify-between text-xs">
+              <span>Contact: {supplierToDelete.contactPerson} ({supplierToDelete.phone})</span>
+              <span className="font-semibold">{supplierToDelete.district || "Artisan Guild"}</span>
+            </div>
+          }
+        />
+      )}
+
+      {/* Sourcing Receipt Deletion Modal */}
+      {receiptToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(receiptToDelete)}
+          onClose={() => setReceiptToDelete(null)}
+          onConfirm={handleConfirmDeleteReceipt}
+          title={language === "bn" ? "সোর্সিং রেকর্ড মুছবেন?" : "Delete Sourcing Batch?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে ${receiptToDelete.batchNumber} ব্যাচের সোর্সিং রেকর্ডটি মুছে ফেলতে চান?`
+              : `Are you sure you want to delete sourcing batch record #${receiptToDelete.batchNumber}?`
+          }
+          itemPreview={
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium">{receiptToDelete.productName} ({receiptToDelete.quantityReceived} pcs)</span>
+              <span className="font-mono font-bold text-silk-900 dark:text-silk-100">
+                {formatPriceBDT(receiptToDelete.purchaseCostBDT * receiptToDelete.quantityReceived, language)}
+              </span>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }

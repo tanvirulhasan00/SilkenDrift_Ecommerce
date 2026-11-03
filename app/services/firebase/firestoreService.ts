@@ -28,6 +28,7 @@ import {
   Supplier,
   Coupon,
   DeliveryZone,
+  ReviewItem,
 } from "~/types";
 import {
   SEED_PRODUCTS,
@@ -1001,6 +1002,76 @@ class FirestoreService {
       : [...current, slug];
     await this.saveWishlist(updated, userId);
     return updated;
+  }
+
+  // ==========================================
+  // REVIEWS
+  // ==========================================
+
+  async getReviews(): Promise<ReviewItem[]> {
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        const snap = await getDocs(collection(db, "reviews"));
+        if (!snap.empty) {
+          const list: ReviewItem[] = [];
+          snap.forEach((d) => list.push(d.data() as ReviewItem));
+          return list;
+        }
+      } catch (err) {
+        console.warn("Firestore getReviews fallback to mockStore:", err);
+      }
+    }
+    return mockRepository.getReviews();
+  }
+
+  async saveReview(review: ReviewItem): Promise<ReviewItem> {
+    const saved = mockRepository.saveReview(review);
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await setDoc(doc(db, "reviews", review.id), review, { merge: true });
+      } catch (err) {
+        console.error("Firestore saveReview error:", err);
+      }
+    }
+    return saved;
+  }
+
+  async updateReviewStatus(
+    id: string,
+    status: "approved" | "pending" | "rejected"
+  ): Promise<void> {
+    mockRepository.updateReviewStatus(id, status);
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await updateDoc(doc(db, "reviews", id), { status });
+      } catch (err) {
+        console.error("Firestore updateReviewStatus error:", err);
+      }
+    }
+  }
+
+  async deleteReview(id: string): Promise<void> {
+    mockRepository.deleteReview(id);
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await deleteDoc(doc(db, "reviews", id));
+      } catch (err) {
+        console.error("Firestore deleteReview error:", err);
+      }
+    }
+  }
+
+  async deleteReviews(ids: string[]): Promise<void> {
+    mockRepository.deleteReviews(ids);
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        const batch = writeBatch(db);
+        ids.forEach((id) => batch.delete(doc(db, "reviews", id)));
+        await batch.commit();
+      } catch (err) {
+        console.error("Firestore deleteReviews batch error:", err);
+      }
+    }
   }
 }
 

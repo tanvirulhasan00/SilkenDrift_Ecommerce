@@ -8,6 +8,7 @@ import { getAdminPath } from "~/config/adminConfig";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { Input } from "~/components/ui/Input";
 import { ImageUploadInput } from "~/components/ui/ImageUploadInput";
 import { normalizeImageUrl } from "~/lib/imageUrl";
@@ -75,12 +76,31 @@ export default function AdminProductsPage() {
   const [isCategoryBulkDeleteModalOpen, setIsCategoryBulkDeleteModalOpen] = useState(false);
   const [isDeletingCategoryBulk, setIsDeletingCategoryBulk] = useState(false);
 
-  const handleDeleteProduct = async (id: string) => {
-    if (confirm(language === "bn" ? "আপনি কি নিশ্চিতভাবে এই পণ্যটি মুছে ফেলতে চান?" : "Are you sure you want to delete this product?")) {
+  // Single deletion modal states
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [isDeletingSingleProduct, setIsDeletingSingleProduct] = useState(false);
+
+  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [isDeletingSingleCategory, setIsDeletingSingleCategory] = useState(false);
+
+  const handleConfirmDeleteSingleProduct = async () => {
+    if (!productToDelete) return;
+    setIsDeletingSingleProduct(true);
+    try {
+      const id = productToDelete.id;
       await firestoreService.deleteProduct(id);
       setProducts(products.filter((p) => p.id !== id));
       setSelectedProductIds((prev) => prev.filter((item) => item !== id));
-      showToast("Product deleted successfully", "info");
+      showToast(
+        language === "bn" ? "পণ্যটি সফলভাবে মুছে ফেলা হয়েছে" : "Product deleted successfully",
+        "info"
+      );
+      setProductToDelete(null);
+    } catch (err) {
+      console.error("Delete product error:", err);
+      showToast("Failed to delete product", "error");
+    } finally {
+      setIsDeletingSingleProduct(false);
     }
   };
 
@@ -203,23 +223,25 @@ export default function AdminProductsPage() {
     setIsCategoryModalOpen(false);
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    const productsInCat = products.filter((p) => p.categoryId === id);
-    if (productsInCat.length > 0) {
-      if (
-        !confirm(
-          `This category has ${productsInCat.length} products associated with it. Are you sure you want to delete it?`
-        )
-      ) {
-        return;
-      }
-    } else if (!confirm("Are you sure you want to delete this category?")) {
-      return;
+  const handleConfirmDeleteSingleCategory = async () => {
+    if (!categoryToDelete) return;
+    setIsDeletingSingleCategory(true);
+    try {
+      const id = categoryToDelete.id;
+      await firestoreService.deleteCategory(id);
+      setCategories(categories.filter((c) => c.id !== id));
+      setSelectedCategoryIds((prev) => prev.filter((item) => item !== id));
+      showToast(
+        language === "bn" ? "ক্যাটাগরি সফলভাবে মুছে ফেলা হয়েছে" : "Category deleted successfully",
+        "info"
+      );
+      setCategoryToDelete(null);
+    } catch (err) {
+      console.error("Delete category error:", err);
+      showToast("Failed to delete category", "error");
+    } finally {
+      setIsDeletingSingleCategory(false);
     }
-
-    await firestoreService.deleteCategory(id);
-    setCategories(categories.filter((c) => c.id !== id));
-    showToast("Category deleted successfully", "info");
   };
 
   // Filtered Products
@@ -556,7 +578,7 @@ export default function AdminProductsPage() {
                             </Link>
                             <button
                               type="button"
-                              onClick={() => handleDeleteProduct(p.id)}
+                              onClick={() => setProductToDelete(p)}
                               className="p-1.5 rounded-lg border border-silk-200 hover:border-rose-400 hover:bg-rose-50 text-silk-400 hover:text-rose-600 dark:border-dark-border dark:hover:bg-rose-950/30 transition"
                               title="Delete Product"
                             >
@@ -733,7 +755,7 @@ export default function AdminProductsPage() {
                       size="sm"
                       variant="ghost"
                       className="text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                      onClick={() => handleDeleteCategory(c.id)}
+                      onClick={() => setCategoryToDelete(c)}
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </Button>
@@ -1020,6 +1042,58 @@ export default function AdminProductsPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Single Product Deletion Modal */}
+      {productToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(productToDelete)}
+          onClose={() => !isDeletingSingleProduct && setProductToDelete(null)}
+          onConfirm={handleConfirmDeleteSingleProduct}
+          isLoading={isDeletingSingleProduct}
+          title={language === "bn" ? "পণ্য মুছে ফেলবেন?" : "Delete Product?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${productToDelete.nameBn || productToDelete.nameEn}" পণ্যটি মুছে ফেলতে চান?`
+              : `Are you sure you want to permanently delete "${productToDelete.nameEn}"?`
+          }
+          itemPreview={
+            <div className="flex items-center gap-2.5">
+              <span className="font-mono font-bold text-silk-900 dark:text-silk-100">
+                SKU: {productToDelete.sku}
+              </span>
+              <span>•</span>
+              <span>{formatPriceBDT(productToDelete.basePriceBDT, language)}</span>
+              <span>•</span>
+              <span>{productToDelete.stockTotal} pcs in stock</span>
+            </div>
+          }
+        />
+      )}
+
+      {/* Single Category Deletion Modal */}
+      {categoryToDelete && (() => {
+        const linkedCount = products.filter((p) => p.categoryId === categoryToDelete.id).length;
+        return (
+          <ConfirmModal
+            isOpen={Boolean(categoryToDelete)}
+            onClose={() => !isDeletingSingleCategory && setCategoryToDelete(null)}
+            onConfirm={handleConfirmDeleteSingleCategory}
+            isLoading={isDeletingSingleCategory}
+            title={language === "bn" ? "ক্যাটাগরি মুছে ফেলবেন?" : "Delete Category?"}
+            message={
+              linkedCount > 0 ? (
+                language === "bn"
+                  ? `এই ক্যাটাগরিতে বর্তমানে ${linkedCount} টি পণ্য যুক্ত রয়েছে। আপনি কি নিশ্চিতভাবে "${categoryToDelete.nameBn || categoryToDelete.nameEn}" মুছে ফেলতে চান?`
+                  : `This category currently has ${linkedCount} product(s) associated with it. Are you sure you want to delete "${categoryToDelete.nameEn}"?`
+              ) : (
+                language === "bn"
+                  ? `আপনি কি নিশ্চিতভাবে "${categoryToDelete.nameBn || categoryToDelete.nameEn}" ক্যাটাগরি মুছে ফেলতে চান?`
+                  : `Are you sure you want to delete "${categoryToDelete.nameEn}"?`
+              )
+            }
+          />
+        );
+      })()}
     </div>
   );
 }

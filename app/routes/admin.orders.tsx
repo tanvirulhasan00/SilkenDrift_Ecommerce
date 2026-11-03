@@ -7,9 +7,12 @@ import { formatPriceBDT, formatDate } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { Input } from "~/components/ui/Input";
 import { useToast } from "~/components/feedback/ToastContext";
 import { Order, OrderStatus, PaymentStatus } from "~/types";
+import { getAdminPath } from "~/config/adminConfig";
+import { OrderInvoice } from "~/components/orders/OrderInvoice";
 import {
   Search,
   Truck,
@@ -50,6 +53,13 @@ export default function AdminOrdersPage() {
   const [courierProvider, setCourierProvider] = useState<"pathao" | "steadfast" | "redx">("pathao");
   const [trackingId, setTrackingId] = useState("");
 
+  // Modal for official invoice preview & print
+  const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null);
+
+  // Single order delete modal
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [isDeletingSingleOrder, setIsDeletingSingleOrder] = useState(false);
+
   // Order Selection & Bulk Delete
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
@@ -89,14 +99,12 @@ export default function AdminOrdersPage() {
     );
   };
 
-  const handleDeleteOrder = async (id: string, orderNumber: string) => {
-    if (
-      confirm(
-        language === "bn"
-          ? `আপনি কি নিশ্চিতভাবে অর্ডার #${orderNumber} মুছে ফেলতে চান?`
-          : `Are you sure you want to delete Order #${orderNumber}?`
-      )
-    ) {
+  const handleConfirmDeleteSingleOrder = async () => {
+    if (!orderToDelete) return;
+    setIsDeletingSingleOrder(true);
+    try {
+      const id = orderToDelete.id;
+      const orderNumber = orderToDelete.orderNumber;
       await firestoreService.deleteOrder(id);
       setOrders((prev) => prev.filter((o) => o.id !== id));
       setSelectedOrderIds((prev) => prev.filter((item) => item !== id));
@@ -104,6 +112,12 @@ export default function AdminOrdersPage() {
         language === "bn" ? `অর্ডার #${orderNumber} মুছে ফেলা হয়েছে` : `Order #${orderNumber} deleted`,
         "info"
       );
+      setOrderToDelete(null);
+    } catch (err) {
+      console.error("Delete order error:", err);
+      showToast("Failed to delete order", "error");
+    } finally {
+      setIsDeletingSingleOrder(false);
     }
   };
 
@@ -357,17 +371,17 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        <Link
-                          to={`/order/success/${order.id}`}
-                          target="_blank"
-                          className="p-1.5 rounded-lg border border-silk-200 hover:border-gold-500 hover:bg-gold-50 text-silk-500 hover:text-silk-950 dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated transition"
-                          title="Print Invoice"
-                        >
-                          <Printer className="w-3.5 h-3.5" />
-                        </Link>
                         <button
                           type="button"
-                          onClick={() => handleDeleteOrder(order.id, order.orderNumber)}
+                          onClick={() => setInvoiceOrder(order)}
+                          className="p-1.5 rounded-lg border border-silk-200 hover:border-gold-500 hover:bg-gold-50 text-silk-500 hover:text-silk-950 dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated transition"
+                          title={language === "bn" ? "চালান প্রিন্ট ও প্রিভিউ" : "Print & Preview Invoice"}
+                        >
+                          <Printer className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOrderToDelete(order)}
                           className="p-1.5 rounded-lg border border-silk-200 hover:border-rose-400 hover:bg-rose-50 text-silk-400 hover:text-rose-600 dark:border-dark-border dark:hover:bg-rose-950/30 transition"
                           title="Delete Order"
                         >
@@ -501,6 +515,72 @@ export default function AdminOrdersPage() {
           </div>
         </div>
       </Modal>
+      {/* Official Invoice Preview & Print Modal */}
+      {invoiceOrder && (
+        <Modal
+          isOpen={Boolean(invoiceOrder)}
+          onClose={() => setInvoiceOrder(null)}
+          title={`Official Invoice: #${invoiceOrder.orderNumber}`}
+          maxWidth="3xl"
+        >
+          <div className="space-y-4">
+            {/* Control Bar inside Modal */}
+            <div className="no-print flex flex-wrap items-center justify-between gap-3 p-3 bg-silk-50 dark:bg-dark-elevated rounded-xl border border-silk-200 dark:border-dark-border">
+              <div className="text-xs text-silk-600 dark:text-silk-400">
+                <span>
+                  Customer: <strong className="text-silk-900 dark:text-silk-100">{invoiceOrder.customerName}</strong> ({invoiceOrder.customerPhone})
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  to={getAdminPath(`orders/${invoiceOrder.id}/invoice`)}
+                  target="_blank"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-silk-300 dark:border-dark-border text-xs font-semibold text-silk-700 dark:text-silk-300 hover:bg-white dark:hover:bg-dark-surface transition"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 mr-1" />
+                  <span>{language === "bn" ? "নতুন ট্যাবে খুলুন" : "Open in New Tab"}</span>
+                </Link>
+                <Button
+                  onClick={() => window.print()}
+                  variant="gold"
+                  size="sm"
+                  className="shadow-luxury"
+                >
+                  <Printer className="w-3.5 h-3.5 mr-1.5" />
+                  <span>{language === "bn" ? "প্রিন্ট চালান" : "Print Invoice"}</span>
+                </Button>
+              </div>
+            </div>
+
+            {/* The Clean Printable Invoice */}
+            <OrderInvoice order={invoiceOrder} />
+          </div>
+        </Modal>
+      )}
+
+      {/* Single Order Deletion Modal */}
+      {orderToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(orderToDelete)}
+          onClose={() => !isDeletingSingleOrder && setOrderToDelete(null)}
+          onConfirm={handleConfirmDeleteSingleOrder}
+          isLoading={isDeletingSingleOrder}
+          title={language === "bn" ? `অর্ডার #${orderToDelete.orderNumber} মুছে ফেলবেন?` : `Delete Order #${orderToDelete.orderNumber}?`}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে ${orderToDelete.customerName}-এর অর্ডার #${orderToDelete.orderNumber} মুছে ফেলতে চান?`
+              : `Are you sure you want to delete order #${orderToDelete.orderNumber} placed by ${orderToDelete.customerName}?`
+          }
+          itemPreview={
+            <div className="flex items-center justify-between">
+              <span>{orderToDelete.items.length} item(s)</span>
+              <span className="font-bold text-silk-900 dark:text-silk-100 font-mono">
+                {formatPriceBDT(orderToDelete.totalBDT, language)}
+              </span>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }

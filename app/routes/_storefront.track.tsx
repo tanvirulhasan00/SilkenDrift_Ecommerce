@@ -47,11 +47,13 @@ const TRACKING_STAGES: { status: OrderStatus; labelEn: string; labelBn: string; 
   { status: "processing", labelEn: "Processing & Sourced", labelBn: "তাঁত ও স্টক প্রস্তুতি", step: 3 },
   { status: "packed", labelEn: "Inspected & Packed", labelBn: "প্যাকেজিং সম্পন্ন", step: 4 },
   { status: "shipped", labelEn: "In Transit / Courier", labelBn: "কুরিয়ারে হস্তান্তর", step: 5 },
-  { status: "out_for_delivery", labelEn: "Out for Delivery", labelBn: "ডেলিভারিতে বের হয়েছে", step: 6 },
-  { status: "delivered", labelEn: "Delivered", labelBn: "ডেলিভারি সম্পন্ন", step: 7 },
+  { status: "delivered", labelEn: "Delivered", labelBn: "ডেলিভারি সম্পন্ন", step: 6 },
 ];
 
 function getStageIndex(status: OrderStatus): number {
+  if (status === "out_for_delivery") {
+    return TRACKING_STAGES.findIndex((s) => s.status === "shipped");
+  }
   const idx = TRACKING_STAGES.findIndex((s) => s.status === status);
   if (idx >= 0) return idx;
   if (status === "cancelled" || status === "returned" || status === "failed_delivery") return -1;
@@ -411,7 +413,7 @@ export default function OrderTrackerPage() {
                 </div>
 
                 {/* Stages list */}
-                <div className="grid grid-cols-2 sm:grid-cols-7 gap-3 sm:gap-2 relative z-10">
+                <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 sm:gap-2 relative z-10">
                   {TRACKING_STAGES.map((st, idx) => {
                     const isCompleted = idx < currentStageIndex;
                     const isCurrent = idx === currentStageIndex;

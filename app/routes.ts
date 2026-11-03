@@ -28,6 +28,9 @@ export default [
   route("deshboard", "routes/deshboard.tsx"),
   route("dashboard", "routes/staff.portal.tsx"),
 
+  // Standalone Printable Invoice for Staff (Outside storefront layout)
+  route(`${ADMIN_SECRET_PATH}/orders/:id/invoice`, "routes/admin.order.invoice.tsx"),
+
   // Secret Administration Vault (Unguessable disguised path)
   layout("routes/admin.tsx", [
     route(ADMIN_SECRET_PATH, "routes/admin._index.tsx"),

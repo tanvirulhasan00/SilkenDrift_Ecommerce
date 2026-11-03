@@ -5,50 +5,14 @@ import { formatPriceBDT, formatDate } from "~/lib/formatters";
 import { Button } from "~/components/ui/Button";
 import { Badge } from "~/components/ui/Badge";
 import { Modal } from "~/components/ui/Modal";
+import { ConfirmModal } from "~/components/ui/ConfirmModal";
 import { useToast } from "~/components/feedback/ToastContext";
 import { Star, CheckCircle2, XCircle, MessageSquare, Trash2, AlertTriangle, X } from "lucide-react";
-
-interface ReviewItem {
-  id: string;
-  productName: string;
-  customerName: string;
-  rating: number;
-  comment: string;
-  date: string;
-  status: "approved" | "pending" | "rejected";
-}
+import type { ReviewItem } from "~/types";
+import { firestoreService } from "~/services/firebase/firestoreService";
 
 export async function clientLoader() {
-  const reviews: ReviewItem[] = [
-    {
-      id: "rev_01",
-      productName: "Padma Gold Zari Rajshahi Mulberry Silk Saree",
-      customerName: "Dr. Sadia Afrin",
-      rating: 5,
-      comment: "Received in Dhaka within 48 hours. Beautiful genuine silk fabric, looks exactly as pictured.",
-      date: "2026-02-14",
-      status: "approved",
-    },
-    {
-      id: "rev_02",
-      productName: "Bespoke Royal Endi Silk Embroidered Panjabi",
-      customerName: "Kamal Hossain",
-      rating: 5,
-      comment: "Bought this as a wedding gift. Packaging was premium and luxurious. Highly recommended!",
-      date: "2026-02-15",
-      status: "approved",
-    },
-    {
-      id: "rev_03",
-      productName: "Tangail Jacquard Soft Silk Festive Saree",
-      customerName: "Nusrat Jahan",
-      rating: 4,
-      comment: "Color fastness is good, though delivery to Sylhet took 3 days instead of 2.",
-      date: "2026-02-16",
-      status: "pending",
-    },
-  ];
-
+  const reviews = await firestoreService.getReviews();
   return { reviews };
 }
 
@@ -60,6 +24,9 @@ export default function AdminReviewsPage() {
   const [reviews, setReviews] = useState<ReviewItem[]>(initialReviews);
   const [selectedReviewIds, setSelectedReviewIds] = useState<string[]>([]);
   const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+
+  // Single review delete modal state
+  const [reviewToDelete, setReviewToDelete] = useState<ReviewItem | null>(null);
 
   const isAllReviewsSelected =
     reviews.length > 0 && reviews.every((r) => selectedReviewIds.includes(r.id));
@@ -82,30 +49,28 @@ export default function AdminReviewsPage() {
   };
 
   const handleStatusChange = (id: string, newStatus: ReviewItem["status"]) => {
+    firestoreService.updateReviewStatus(id, newStatus);
     setReviews(
       reviews.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
     );
     showToast(`Review marked as ${newStatus}`, "success");
   };
 
-  const handleDeleteReview = (id: string) => {
-    if (
-      confirm(
-        language === "bn"
-          ? "আপনি কি নিশ্চিতভাবে এই রিভিউটি মুছে ফেলতে চান?"
-          : "Are you sure you want to delete this review?"
-      )
-    ) {
-      setReviews((prev) => prev.filter((r) => r.id !== id));
-      setSelectedReviewIds((prev) => prev.filter((item) => item !== id));
-      showToast(
-        language === "bn" ? "রিভিউ মুছে ফেলা হয়েছে" : "Review deleted",
-        "info"
-      );
-    }
+  const handleConfirmDeleteSingleReview = () => {
+    if (!reviewToDelete) return;
+    const id = reviewToDelete.id;
+    firestoreService.deleteReview(id);
+    setReviews((prev) => prev.filter((r) => r.id !== id));
+    setSelectedReviewIds((prev) => prev.filter((item) => item !== id));
+    showToast(
+      language === "bn" ? "রিভিউ মুছে ফেলা হয়েছে" : "Review deleted",
+      "info"
+    );
+    setReviewToDelete(null);
   };
 
   const handleConfirmBulkDeleteReviews = () => {
+    firestoreService.deleteReviews(selectedReviewIds);
     const idSet = new Set(selectedReviewIds);
     setReviews((prev) => prev.filter((r) => !idSet.has(r.id)));
     showToast(
@@ -277,7 +242,7 @@ export default function AdminReviewsPage() {
                         )}
                         <button
                           type="button"
-                          onClick={() => handleDeleteReview(r.id)}
+                          onClick={() => setReviewToDelete(r)}
                           className="p-1.5 rounded-lg border border-silk-200 hover:border-rose-400 hover:bg-rose-50 text-silk-400 hover:text-rose-600 dark:border-dark-border dark:hover:bg-rose-950/30 transition"
                           title="Delete Review"
                         >
@@ -344,6 +309,30 @@ export default function AdminReviewsPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Single Review Deletion Modal */}
+      {reviewToDelete && (
+        <ConfirmModal
+          isOpen={Boolean(reviewToDelete)}
+          onClose={() => setReviewToDelete(null)}
+          onConfirm={handleConfirmDeleteSingleReview}
+          title={language === "bn" ? "রিভিউ মুছে ফেলবেন?" : "Delete Review?"}
+          message={
+            language === "bn"
+              ? `আপনি কি নিশ্চিতভাবে "${reviewToDelete.customerName}"-এর দেওয়া এই রিভিউটি মুছে ফেলতে চান?`
+              : `Are you sure you want to permanently delete this review by "${reviewToDelete.customerName}"?`
+          }
+          itemPreview={
+            <div className="space-y-1">
+              <div className="flex items-center justify-between font-bold">
+                <span>{reviewToDelete.productName}</span>
+                <span className="text-amber-500 font-mono">★ {reviewToDelete.rating}/5</span>
+              </div>
+              <p className="text-silk-600 dark:text-silk-400 italic">"{reviewToDelete.comment}"</p>
+            </div>
+          }
+        />
+      )}
     </div>
   );
 }
