@@ -57,6 +57,60 @@ export default function HomePage() {
   const [newsletterInput, setNewsletterInput] = React.useState("");
   const heroBanner = banners[0];
 
+  // Exclusive Flash Deals mobile slider state
+  const [currentFlashIndex, setCurrentFlashIndex] = React.useState(0);
+  const [isFlashPaused, setIsFlashPaused] = React.useState(false);
+  const [flashTouchStartX, setFlashTouchStartX] = React.useState<number | null>(null);
+  const [flashTouchDeltaX, setFlashTouchDeltaX] = React.useState(0);
+
+  const handlePrevFlash = () => {
+    setCurrentFlashIndex((prev) =>
+      prev > 0 ? prev - 1 : Math.max(0, flashDeals.length - 1)
+    );
+  };
+
+  const handleNextFlash = () => {
+    setCurrentFlashIndex((prev) =>
+      prev < flashDeals.length - 1 ? prev + 1 : 0
+    );
+  };
+
+  const handleFlashTouchStart = (e: React.TouchEvent) => {
+    setIsFlashPaused(true);
+    setFlashTouchStartX(e.touches[0].clientX);
+    setFlashTouchDeltaX(0);
+  };
+
+  const handleFlashTouchMove = (e: React.TouchEvent) => {
+    if (flashTouchStartX !== null) {
+      setFlashTouchDeltaX(e.touches[0].clientX - flashTouchStartX);
+    }
+  };
+
+  const handleFlashTouchEnd = () => {
+    if (flashTouchStartX !== null) {
+      if (flashTouchDeltaX < -40) {
+        handleNextFlash();
+      } else if (flashTouchDeltaX > 40) {
+        handlePrevFlash();
+      }
+    }
+    setFlashTouchStartX(null);
+    setFlashTouchDeltaX(0);
+    setIsFlashPaused(false);
+  };
+
+  // Auto-advance flash deals slider on mobile
+  React.useEffect(() => {
+    if (flashDeals.length <= 1 || isFlashPaused) return;
+    const interval = setInterval(() => {
+      setCurrentFlashIndex((prev) =>
+        prev < flashDeals.length - 1 ? prev + 1 : 0
+      );
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [flashDeals.length, isFlashPaused]);
+
   // Filter 5-star approved reviews only, and randomize their display order
   const [fiveStarReviews, setFiveStarReviews] = React.useState<ReviewItem[]>([]);
   React.useEffect(() => {
@@ -390,9 +444,72 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
-              {flashDeals.slice(0, 3).map((product, idx) => (
-                <div key={product.id} className={idx >= 2 ? "hidden sm:block" : ""}>
+            {/* Mobile View: 1 Card At A Time Slider (< sm) */}
+            <div
+              className="sm:hidden relative"
+              onMouseEnter={() => setIsFlashPaused(true)}
+              onMouseLeave={() => setIsFlashPaused(false)}
+              onTouchStart={handleFlashTouchStart}
+              onTouchMove={handleFlashTouchMove}
+              onTouchEnd={handleFlashTouchEnd}
+            >
+              <div className="overflow-hidden rounded-2xl">
+                <div
+                  className="flex transition-transform duration-500 ease-out"
+                  style={{ transform: `translateX(-${currentFlashIndex * 100}%)` }}
+                >
+                  {flashDeals.map((product) => (
+                    <div key={product.id} className="w-full flex-shrink-0 px-0.5">
+                      <ProductCard product={product} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Mobile Slider Controls: Prev, Next & Dots */}
+              {flashDeals.length > 1 && (
+                <div className="flex items-center justify-between mt-4 px-1">
+                  <button
+                    type="button"
+                    onClick={handlePrevFlash}
+                    className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-crimson-600 active:scale-95 transition"
+                    aria-label="Previous flash deal"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <div className="flex items-center gap-1.5">
+                    {flashDeals.map((_, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => setCurrentFlashIndex(idx)}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          currentFlashIndex === idx
+                            ? "w-6 bg-crimson-600"
+                            : "w-2 bg-silk-300 dark:bg-silk-700 hover:bg-crimson-400"
+                        }`}
+                        aria-label={`Go to flash deal ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleNextFlash}
+                    className="p-2 rounded-full bg-white dark:bg-dark-elevated shadow-card border border-silk-200 dark:border-dark-border text-silk-700 dark:text-silk-300 hover:text-crimson-600 active:scale-95 transition"
+                    aria-label="Next flash deal"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Desktop / Tablet View: Grid (>= sm) */}
+            <div className="hidden sm:grid sm:grid-cols-3 gap-6">
+              {flashDeals.slice(0, 3).map((product) => (
+                <div key={product.id}>
                   <ProductCard product={product} />
                 </div>
               ))}
