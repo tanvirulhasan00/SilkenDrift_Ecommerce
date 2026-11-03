@@ -200,6 +200,25 @@ class FirestoreService {
     return true;
   }
 
+  /**
+   * Delete multiple products in batch from Firestore or local mock store
+   */
+  async deleteProducts(ids: string[]): Promise<boolean> {
+    if (ids.length === 0) return true;
+    this.productsCache = null;
+    mockRepository.deleteProducts(ids);
+
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await Promise.all(ids.map((id) => deleteDoc(doc(db, "products", id))));
+      } catch (err) {
+        console.error("Firestore deleteProducts error:", err);
+      }
+    }
+
+    return true;
+  }
+
   // ==========================================
   // CATEGORIES CRUD
   // ==========================================
@@ -256,6 +275,24 @@ class FirestoreService {
         await deleteDoc(doc(db, "categories", id));
       } catch (err) {
         console.error("Firestore deleteCategory error:", err);
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Delete multiple categories in batch
+   */
+  async deleteCategories(ids: string[]): Promise<boolean> {
+    if (ids.length === 0) return true;
+    mockRepository.deleteCategories(ids);
+
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await Promise.all(ids.map((id) => deleteDoc(doc(db, "categories", id))));
+      } catch (err) {
+        console.error("Firestore deleteCategories error:", err);
       }
     }
 
@@ -333,6 +370,8 @@ class FirestoreService {
   async createOrder(
     orderData: Omit<Order, "id" | "orderNumber" | "createdAt" | "updatedAt" | "timeline">
   ): Promise<Order> {
+    this.productsCache = null; // Invalidate products cache
+
     // Save to local store for instant reactive UI & inventory deduction
     const newOrder = mockRepository.createOrder(orderData);
 
@@ -341,6 +380,23 @@ class FirestoreService {
       try {
         const orderRef = doc(db, "orders", newOrder.id);
         await setDoc(orderRef, newOrder);
+
+        // Synchronize updated stock and variants to Firestore
+        for (const item of newOrder.items) {
+          const updatedProd = mockRepository.getProductById(item.productId);
+          if (updatedProd) {
+            const prodRef = doc(db, "products", updatedProd.id);
+            await setDoc(
+              prodRef,
+              {
+                stockTotal: updatedProd.stockTotal,
+                variants: updatedProd.variants || [],
+                updatedAt: new Date().toISOString(),
+              },
+              { merge: true }
+            );
+          }
+        }
       } catch (err) {
         console.error("Firestore createOrder error (order saved locally):", err);
       }
@@ -436,6 +492,41 @@ class FirestoreService {
     }
 
     return updated;
+  }
+
+  /**
+   * Delete order from Firestore (real mode) or local mock store (demo mode)
+   */
+  async deleteOrder(id: string): Promise<boolean> {
+    mockRepository.deleteOrder(id);
+
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await deleteDoc(doc(db, "orders", id));
+      } catch (err) {
+        console.error("Firestore deleteOrder error:", err);
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Delete multiple orders in batch
+   */
+  async deleteOrders(ids: string[]): Promise<boolean> {
+    if (ids.length === 0) return true;
+    mockRepository.deleteOrders(ids);
+
+    if (this.hasLiveFirestore && !this.isDemoMode) {
+      try {
+        await Promise.all(ids.map((id) => deleteDoc(doc(db, "orders", id))));
+      } catch (err) {
+        console.error("Firestore deleteOrders error:", err);
+      }
+    }
+
+    return true;
   }
 
   /**

@@ -111,9 +111,12 @@ function ProductEditorForm({
   const [prodSalePriceBDT, setProdSalePriceBDT] = useState<string>(
     initialProduct?.salePriceBDT ? String(initialProduct.salePriceBDT) : ""
   );
-  const [prodStockTotal, setProdStockTotal] = useState<number>(
-    initialProduct ? initialProduct.stockTotal : 20
-  );
+  const [prodStockTotal, setProdStockTotal] = useState<number>(() => {
+    if (initialProduct?.variants && initialProduct.variants.length > 0) {
+      return initialProduct.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+    }
+    return initialProduct ? initialProduct.stockTotal : 20;
+  });
   const [prodLowStockThreshold, setProdLowStockThreshold] = useState<number>(
     initialProduct?.lowStockThreshold || 5
   );

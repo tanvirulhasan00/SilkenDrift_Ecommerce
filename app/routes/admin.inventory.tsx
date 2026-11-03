@@ -35,9 +35,21 @@ export default function AdminInventoryPage() {
     if (!selectedProduct || adjustmentDelta === 0) return;
 
     const prevStock = selectedProduct.stockTotal;
-    const newStock = Math.max(0, prevStock + adjustmentDelta);
-    selectedProduct.stockTotal = newStock;
+    if (selectedProduct.variants && selectedProduct.variants.length > 0) {
+      const targetVariant =
+        selectedProduct.variants.find((v) => v.isDefault) || selectedProduct.variants[0];
+      if (targetVariant) {
+        targetVariant.stock = Math.max(0, (Number(targetVariant.stock) || 0) + adjustmentDelta);
+      }
+      selectedProduct.stockTotal = selectedProduct.variants.reduce(
+        (sum, v) => sum + (Number(v.stock) || 0),
+        0
+      );
+    } else {
+      selectedProduct.stockTotal = Math.max(0, prevStock + adjustmentDelta);
+    }
     mockRepository.saveProduct(selectedProduct);
+    const newStock = selectedProduct.stockTotal;
 
     const newMov: InventoryMovement = {
       id: `mov_${Date.now()}`,

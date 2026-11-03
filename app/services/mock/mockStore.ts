@@ -114,6 +114,7 @@ class MockDataRepository {
         if (set) {
           this.settings = { ...SEED_SETTINGS, ...JSON.parse(set) };
         }
+        this.syncAllProductsVariantStock();
       } catch {
         this.loadSeeds();
       }
@@ -121,6 +122,22 @@ class MockDataRepository {
       this.loadSeeds();
     }
     this.initialized = true;
+  }
+
+  private syncAllProductsVariantStock() {
+    let changed = false;
+    for (const prod of this.products) {
+      if (prod.variants && prod.variants.length > 0) {
+        const variantSum = prod.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+        if (prod.stockTotal !== variantSum) {
+          prod.stockTotal = variantSum;
+          changed = true;
+        }
+      }
+    }
+    if (changed) {
+      this.persist("sd_mock_products", this.products);
+    }
   }
 
   private loadSeeds() {
@@ -137,6 +154,7 @@ class MockDataRepository {
     this.coupons = [...SEED_COUPONS];
     this.banners = [...SEED_BANNERS];
     this.settings = { ...SEED_SETTINGS };
+    this.syncAllProductsVariantStock();
   }
 
   private persist(key: string, data: unknown) {
@@ -164,6 +182,9 @@ class MockDataRepository {
   }
 
   saveProduct(product: Product): Product {
+    if (product.variants && product.variants.length > 0) {
+      product.stockTotal = product.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+    }
     const idx = this.products.findIndex((p) => p.id === product.id);
     if (idx > -1) {
       this.products[idx] = { ...product, updatedAt: new Date().toISOString() };
@@ -180,6 +201,13 @@ class MockDataRepository {
 
   deleteProduct(id: string): boolean {
     this.products = this.products.filter((p) => p.id !== id);
+    this.persist("sd_mock_products", this.products);
+    return true;
+  }
+
+  deleteProducts(ids: string[]): boolean {
+    const idSet = new Set(ids);
+    this.products = this.products.filter((p) => !idSet.has(p.id));
     this.persist("sd_mock_products", this.products);
     return true;
   }
@@ -208,6 +236,13 @@ class MockDataRepository {
 
   deleteCategory(id: string): boolean {
     this.categories = this.categories.filter((c) => c.id !== id);
+    this.persist("sd_mock_categories", this.categories);
+    return true;
+  }
+
+  deleteCategories(ids: string[]): boolean {
+    const idSet = new Set(ids);
+    this.categories = this.categories.filter((c) => !idSet.has(c.id));
     this.persist("sd_mock_categories", this.categories);
     return true;
   }
@@ -331,8 +366,22 @@ class MockDataRepository {
       const prod = this.getProductById(item.productId);
       if (prod) {
         const prevStock = prod.stockTotal;
-        const newStock = Math.max(0, prod.stockTotal - item.quantity);
-        prod.stockTotal = newStock;
+        if (prod.variants && prod.variants.length > 0) {
+          // Decrement specific variant stock or fallback to default variant
+          let targetVariant = prod.variants.find((v) => v.id === item.variantId);
+          if (!targetVariant) {
+            targetVariant =
+              prod.variants.find((v) => v.isDefault && (Number(v.stock) || 0) > 0) ||
+              prod.variants.find((v) => (Number(v.stock) || 0) > 0) ||
+              prod.variants[0];
+          }
+          if (targetVariant) {
+            targetVariant.stock = Math.max(0, (Number(targetVariant.stock) || 0) - item.quantity);
+          }
+          prod.stockTotal = prod.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+        } else {
+          prod.stockTotal = Math.max(0, prod.stockTotal - item.quantity);
+        }
         this.saveProduct(prod);
 
         this.inventoryMovements.push({
@@ -343,7 +392,7 @@ class MockDataRepository {
           type: "order",
           quantityDelta: -item.quantity,
           previousStock: prevStock,
-          newStock: newStock,
+          newStock: prod.stockTotal,
           referenceId: orderNumber,
           reason: `Customer Order ${orderNumber}`,
           performedBy: "Storefront Checkout",
@@ -390,6 +439,13 @@ class MockDataRepository {
     return true;
   }
 
+  deleteOrders(ids: string[]): boolean {
+    const idSet = new Set(ids);
+    this.orders = this.orders.filter((o) => !idSet.has(o.id));
+    this.persist("sd_mock_orders", this.orders);
+    return true;
+  }
+
   assignCourier(orderId: string, provider: "pathao" | "steadfast" | "redx" | "internal", trackingId: string): Order | undefined {
     const order = this.orders.find((o) => o.id === orderId || o.orderNumber === orderId);
     if (!order) return undefined;
@@ -426,8 +482,15 @@ class MockDataRepository {
     const prod = this.getProductById(record.productId);
     if (prod) {
       const prevStock = prod.stockTotal;
-      const newStock = prod.stockTotal + record.quantityReceived;
-      prod.stockTotal = newStock;
+      if (prod.variants && prod.variants.length > 0) {
+        const targetVariant = prod.variants.find((v) => v.isDefault) || prod.variants[0];
+        if (targetVariant) {
+          targetVariant.stock = (Number(targetVariant.stock) || 0) + record.quantityReceived;
+        }
+        prod.stockTotal = prod.variants.reduce((sum, v) => sum + (Number(v.stock) || 0), 0);
+      } else {
+        prod.stockTotal = prod.stockTotal + record.quantityReceived;
+      }
       this.saveProduct(prod);
 
       this.inventoryMovements.push({
@@ -437,7 +500,7 @@ class MockDataRepository {
         type: "sourcing",
         quantityDelta: record.quantityReceived,
         previousStock: prevStock,
-        newStock: newStock,
+        newStock: prod.stockTotal,
         referenceId: record.batchNumber,
         reason: `Goods receipt from ${record.supplierName}`,
         performedBy: "Admin Inventory Manager",

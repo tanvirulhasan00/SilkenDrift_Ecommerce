@@ -120,7 +120,7 @@ export const SEED_PRODUCTS: Product[] = [
     basePriceBDT: 14500,
     salePriceBDT: 12800,
     discountPercentage: 12,
-    stockTotal: 18,
+    stockTotal: 24,
     lowStockThreshold: 4,
     rating: 4.9,
     reviewCount: 38,

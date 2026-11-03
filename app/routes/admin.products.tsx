@@ -21,6 +21,9 @@ import {
   Layers,
   Package,
   FolderTree,
+  AlertTriangle,
+  X,
+  CheckSquare,
 } from "lucide-react";
 
 export async function clientLoader() {
@@ -63,13 +66,79 @@ export default function AdminProductsPage() {
   const [catIsActive, setCatIsActive] = useState(true);
   const [catFeaturedOnHome, setCatFeaturedOnHome] = useState(true);
 
+  // Selection & Bulk Delete State
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [isBulkDeleteModalOpen, setIsBulkDeleteModalOpen] = useState(false);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
 
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [isCategoryBulkDeleteModalOpen, setIsCategoryBulkDeleteModalOpen] = useState(false);
+  const [isDeletingCategoryBulk, setIsDeletingCategoryBulk] = useState(false);
 
   const handleDeleteProduct = async (id: string) => {
     if (confirm(language === "bn" ? "আপনি কি নিশ্চিতভাবে এই পণ্যটি মুছে ফেলতে চান?" : "Are you sure you want to delete this product?")) {
       await firestoreService.deleteProduct(id);
       setProducts(products.filter((p) => p.id !== id));
+      setSelectedProductIds((prev) => prev.filter((item) => item !== id));
       showToast("Product deleted successfully", "info");
+    }
+  };
+
+  const handleToggleSelectProduct = (id: string) => {
+    setSelectedProductIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleConfirmBulkDeleteProducts = async () => {
+    if (selectedProductIds.length === 0) return;
+    setIsDeletingBulk(true);
+    try {
+      await firestoreService.deleteProducts(selectedProductIds);
+      const idSet = new Set(selectedProductIds);
+      setProducts(products.filter((p) => !idSet.has(p.id)));
+      showToast(
+        language === "bn"
+          ? `${selectedProductIds.length} টি পণ্য সফলভাবে মুছে ফেলা হয়েছে`
+          : `Successfully deleted ${selectedProductIds.length} product(s)`,
+        "success"
+      );
+      setSelectedProductIds([]);
+      setIsBulkDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Bulk delete products error:", err);
+      showToast("Failed to delete selected products", "error");
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  const handleToggleSelectCategory = (id: string) => {
+    setSelectedCategoryIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleConfirmBulkDeleteCategories = async () => {
+    if (selectedCategoryIds.length === 0) return;
+    setIsDeletingCategoryBulk(true);
+    try {
+      await firestoreService.deleteCategories(selectedCategoryIds);
+      const idSet = new Set(selectedCategoryIds);
+      setCategories(categories.filter((c) => !idSet.has(c.id)));
+      showToast(
+        language === "bn"
+          ? `${selectedCategoryIds.length} টি ক্যাটাগরি সফলভাবে মুছে ফেলা হয়েছে`
+          : `Successfully deleted ${selectedCategoryIds.length} category(ies)`,
+        "success"
+      );
+      setSelectedCategoryIds([]);
+      setIsCategoryBulkDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Bulk delete categories error:", err);
+      showToast("Failed to delete selected categories", "error");
+    } finally {
+      setIsDeletingCategoryBulk(false);
     }
   };
 
@@ -164,6 +233,40 @@ export default function AdminProductsPage() {
     return matchesSearch && matchesCat;
   });
 
+  const isAllProductsSelected =
+    filteredProducts.length > 0 &&
+    filteredProducts.every((p) => selectedProductIds.includes(p.id));
+
+  const isSomeProductsSelected =
+    filteredProducts.some((p) => selectedProductIds.includes(p.id)) &&
+    !isAllProductsSelected;
+
+  const handleToggleSelectAllProducts = () => {
+    if (isAllProductsSelected) {
+      const filteredIdSet = new Set(filteredProducts.map((p) => p.id));
+      setSelectedProductIds(selectedProductIds.filter((id) => !filteredIdSet.has(id)));
+    } else {
+      const newSelected = new Set([...selectedProductIds, ...filteredProducts.map((p) => p.id)]);
+      setSelectedProductIds(Array.from(newSelected));
+    }
+  };
+
+  const isAllCategoriesSelected =
+    categories.length > 0 &&
+    categories.every((c) => selectedCategoryIds.includes(c.id));
+
+  const isSomeCategoriesSelected =
+    categories.some((c) => selectedCategoryIds.includes(c.id)) &&
+    !isAllCategoriesSelected;
+
+  const handleToggleSelectAllCategories = () => {
+    if (isAllCategoriesSelected) {
+      setSelectedCategoryIds([]);
+    } else {
+      setSelectedCategoryIds(categories.map((c) => c.id));
+    }
+  };
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -256,12 +359,73 @@ export default function AdminProductsPage() {
             </div>
           </div>
 
+          {/* Bulk Selection Actions Bar */}
+          {selectedProductIds.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 bg-rose-50/90 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-2xl shadow-sm animate-in fade-in duration-200">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  {selectedProductIds.length}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-silk-950 dark:text-silk-100">
+                    {language === "bn"
+                      ? `${selectedProductIds.length} টি পণ্য নির্বাচন করা হয়েছে`
+                      : `${selectedProductIds.length} product${selectedProductIds.length > 1 ? "s" : ""} selected`}
+                  </p>
+                  <p className="text-[11px] text-silk-600 dark:text-silk-400">
+                    {language === "bn"
+                      ? "নির্বাচিত পণ্যগুলো স্থায়ীভাবে মুছে ফেলতে পাশের লাল বাটনে চাপ দিন"
+                      : "Perform bulk deletion or action on selected catalog items"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedProductIds([])}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-xl border border-silk-300 bg-white hover:bg-silk-100 text-silk-700 dark:bg-dark-surface dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated transition flex items-center gap-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>{t.common.deselectAll}</span>
+                </button>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="danger"
+                  onClick={() => setIsBulkDeleteModalOpen(true)}
+                  className="text-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  <span>
+                    {language === "bn"
+                      ? `নির্বাচিত ${selectedProductIds.length} টি মুছুন`
+                      : `Delete Selected (${selectedProductIds.length})`}
+                  </span>
+                </Button>
+              </div>
+            </div>
+          )}
+
           {/* Products Table */}
           <div className="bg-white rounded-2xl border border-silk-200 overflow-hidden shadow-card dark:bg-dark-surface dark:border-dark-border">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-silk-100/90 border-b border-silk-200 dark:bg-dark-elevated dark:border-dark-border text-silk-900 dark:text-silk-200 uppercase text-[10px] font-extrabold tracking-wider">
                   <tr>
+                    <th className="py-3 px-3 w-10 text-center">
+                      <input
+                        type="checkbox"
+                        checked={isAllProductsSelected}
+                        ref={(el) => {
+                          if (el) el.indeterminate = isSomeProductsSelected;
+                        }}
+                        onChange={handleToggleSelectAllProducts}
+                        title={isAllProductsSelected ? t.common.deselectAll : t.common.selectAll}
+                        className="w-4 h-4 rounded border-silk-300 text-gold-600 focus:ring-gold-500 cursor-pointer dark:bg-dark-elevated dark:border-dark-border accent-gold-600"
+                      />
+                    </th>
                     <th className="py-3 px-4">Product & Image</th>
                     <th className="py-3 px-4">SKU</th>
                     <th className="py-3 px-4">Category</th>
@@ -274,8 +438,24 @@ export default function AdminProductsPage() {
                 <tbody className="divide-y divide-silk-100 dark:divide-dark-border">
                   {filteredProducts.map((p) => {
                     const cat = categories.find((c) => c.id === p.categoryId);
+                    const isSelected = selectedProductIds.includes(p.id);
                     return (
-                      <tr key={p.id} className="hover:bg-silk-50/50 dark:hover:bg-dark-elevated/40 transition">
+                      <tr
+                        key={p.id}
+                        className={`transition ${
+                          isSelected
+                            ? "bg-gold-50/70 dark:bg-gold-950/25"
+                            : "hover:bg-silk-50/50 dark:hover:bg-dark-elevated/40"
+                        }`}
+                      >
+                        <td className="py-3 px-3 text-center">
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleToggleSelectProduct(p.id)}
+                            className="w-4 h-4 rounded border-silk-300 text-gold-600 focus:ring-gold-500 cursor-pointer dark:bg-dark-elevated dark:border-dark-border accent-gold-600"
+                          />
+                        </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
                             <div className="relative shrink-0">
@@ -399,17 +579,98 @@ export default function AdminProductsPage() {
       {/* ========================================== */}
       {activeTab === "categories" && (
         <div className="space-y-4">
+          {/* Categories Bulk Selection Bar */}
+          {selectedCategoryIds.length > 0 && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-3.5 bg-rose-50/90 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/60 rounded-2xl shadow-sm animate-in fade-in duration-200">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                  {selectedCategoryIds.length}
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-silk-950 dark:text-silk-100">
+                    {language === "bn"
+                      ? `${selectedCategoryIds.length} টি ক্যাটাগরি নির্বাচন করা হয়েছে`
+                      : `${selectedCategoryIds.length} categor${selectedCategoryIds.length > 1 ? "ies" : "y"} selected`}
+                  </p>
+                  <p className="text-[11px] text-silk-600 dark:text-silk-400">
+                    {language === "bn"
+                      ? "নির্বাচিত ক্যাটাগরিগুলো এক ক্লিকে মুছে ফেলতে ডানপাশের বাটনে চাপ দিন"
+                      : "Perform bulk deletion on selected categories"}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedCategoryIds([])}
+                  className="px-3 py-1.5 text-xs font-semibold rounded-xl border border-silk-300 bg-white hover:bg-silk-100 text-silk-700 dark:bg-dark-surface dark:border-dark-border dark:text-silk-300 dark:hover:bg-dark-elevated transition flex items-center gap-1"
+                >
+                  <X className="w-3.5 h-3.5" />
+                  <span>{t.common.deselectAll}</span>
+                </button>
+
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="danger"
+                  onClick={() => setIsCategoryBulkDeleteModalOpen(true)}
+                  className="text-xs"
+                >
+                  <Trash2 className="w-3.5 h-3.5 mr-1" />
+                  <span>
+                    {language === "bn"
+                      ? `নির্বাচিত ${selectedCategoryIds.length} টি ক্যাটাগরি মুছুন`
+                      : `Delete Selected (${selectedCategoryIds.length})`}
+                  </span>
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Quick Select All Header for Categories */}
+          <div className="flex items-center justify-between px-1">
+            <label className="flex items-center gap-2 text-xs font-semibold text-silk-700 dark:text-silk-300 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isAllCategoriesSelected}
+                ref={(el) => {
+                  if (el) el.indeterminate = isSomeCategoriesSelected;
+                }}
+                onChange={handleToggleSelectAllCategories}
+                className="w-4 h-4 rounded border-silk-300 text-gold-600 focus:ring-gold-500 cursor-pointer dark:bg-dark-elevated dark:border-dark-border accent-gold-600"
+              />
+              <span>
+                {isAllCategoriesSelected
+                  ? t.common.deselectAll
+                  : `${t.common.selectAll} (${categories.length})`}
+              </span>
+            </label>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {categories.map((c) => {
               const productCount = products.filter((p) => p.categoryId === c.id).length;
+              const isSelected = selectedCategoryIds.includes(c.id);
               return (
                 <div
                   key={c.id}
-                  className="bg-white rounded-2xl border border-silk-200 p-5 shadow-card dark:bg-dark-surface dark:border-dark-border flex flex-col justify-between space-y-4"
+                  className={`bg-white rounded-2xl border p-5 shadow-card dark:bg-dark-surface flex flex-col justify-between space-y-4 transition ${
+                    isSelected
+                      ? "border-gold-500 ring-2 ring-gold-500/20 bg-gold-50/20 dark:bg-gold-950/20"
+                      : "border-silk-200 dark:border-dark-border"
+                  }`}
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleSelectCategory(c.id)}
+                          className="w-4 h-4 rounded border-silk-300 text-gold-600 focus:ring-gold-500 cursor-pointer dark:bg-dark-elevated dark:border-dark-border accent-gold-600 shrink-0"
+                          title="Select category"
+                        />
                         {c.imageUrl ? (
                           <img
                             src={normalizeImageUrl(c.imageUrl)}
@@ -483,6 +744,177 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
+
+      {/* ========================================== */}
+      {/* MODAL: BULK DELETE PRODUCTS                */}
+      {/* ========================================== */}
+      <Modal
+        isOpen={isBulkDeleteModalOpen}
+        onClose={() => !isDeletingBulk && setIsBulkDeleteModalOpen(false)}
+        title={
+          language === "bn"
+            ? `নির্বাচিত ${selectedProductIds.length} টি পণ্য মুছে ফেলা`
+            : `Delete ${selectedProductIds.length} Selected Product(s)?`
+        }
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl">
+            <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-rose-900 dark:text-rose-200 space-y-1">
+              <p className="font-bold">
+                {language === "bn"
+                  ? "সতর্কতা: এই কাজটি পূর্বাবস্থায় ফিরিয়ে আনা যাবে না!"
+                  : "Warning: Irreversible catalog action!"}
+              </p>
+              <p>
+                {language === "bn"
+                  ? `আপনি কি নিশ্চিতভাবে নির্বাচিত ${selectedProductIds.length} টি পণ্য মুছে ফেলতে চান? পণ্যগুলো ক্যাটালগ এবং ইনভেন্টরি ডাটাবেস থেকে মুছে যাবে।`
+                  : `Are you sure you want to permanently delete these ${selectedProductIds.length} selected product(s) from your store catalog and inventory database?`}
+              </p>
+            </div>
+          </div>
+
+          {/* Selected Products Preview List */}
+          <div className="border border-silk-200 dark:border-dark-border rounded-xl max-h-48 overflow-y-auto divide-y divide-silk-100 dark:divide-dark-border text-xs">
+            {products
+              .filter((p) => selectedProductIds.includes(p.id))
+              .map((p) => (
+                <div key={p.id} className="p-2.5 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <img
+                      src={normalizeImageUrl(p.images[0])}
+                      alt={p.nameEn}
+                      referrerPolicy="no-referrer"
+                      className="w-8 h-8 rounded-lg object-cover shrink-0 border border-silk-200 dark:border-dark-border"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1610030469983-98e550d6193c?auto=format&fit=crop&w=100&q=60";
+                      }}
+                    />
+                    <div className="truncate">
+                      <span className="font-semibold text-silk-900 dark:text-silk-100 block truncate">
+                        {p.nameEn}
+                      </span>
+                      <span className="text-[10px] text-silk-500 font-mono">
+                        SKU: {p.sku} • {formatPriceBDT(p.salePriceBDT || p.basePriceBDT, language)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-silk-100 dark:border-dark-border">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsBulkDeleteModalOpen(false)}
+              disabled={isDeletingBulk}
+            >
+              {t.common.cancel}
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleConfirmBulkDeleteProducts}
+              disabled={isDeletingBulk}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+              <span>
+                {isDeletingBulk
+                  ? t.common.loading
+                  : language === "bn"
+                  ? `হ্যাঁ, ${selectedProductIds.length} টি মুছুন`
+                  : `Yes, Delete ${selectedProductIds.length} Products`}
+              </span>
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* ========================================== */}
+      {/* MODAL: BULK DELETE CATEGORIES              */}
+      {/* ========================================== */}
+      <Modal
+        isOpen={isCategoryBulkDeleteModalOpen}
+        onClose={() => !isDeletingCategoryBulk && setIsCategoryBulkDeleteModalOpen(false)}
+        title={
+          language === "bn"
+            ? `নির্বাচিত ${selectedCategoryIds.length} টি ক্যাটাগরি মুছে ফেলা`
+            : `Delete ${selectedCategoryIds.length} Selected Categories?`
+        }
+        maxWidth="md"
+      >
+        <div className="space-y-4">
+          <div className="flex items-start gap-3 p-3.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 rounded-xl">
+            <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+            <div className="text-xs text-rose-900 dark:text-rose-200 space-y-1">
+              <p className="font-bold">
+                {language === "bn"
+                  ? "ক্যাটাগরি মুছে ফেলার সতর্কতা!"
+                  : "Category Deletion Warning!"}
+              </p>
+              <p>
+                {language === "bn"
+                  ? `আপনি কি নিশ্চিতভাবে নির্বাচিত ${selectedCategoryIds.length} টি ক্যাটাগরি মুছে ফেলতে চান?`
+                  : `Are you sure you want to delete these ${selectedCategoryIds.length} categories?`}
+              </p>
+            </div>
+          </div>
+
+          {/* Selected Categories Preview List */}
+          <div className="border border-silk-200 dark:border-dark-border rounded-xl max-h-48 overflow-y-auto divide-y divide-silk-100 dark:divide-dark-border text-xs">
+            {categories
+              .filter((c) => selectedCategoryIds.includes(c.id))
+              .map((c) => {
+                const count = products.filter((p) => p.categoryId === c.id).length;
+                return (
+                  <div key={c.id} className="p-2.5 flex items-center justify-between gap-3">
+                    <span className="font-semibold text-silk-900 dark:text-silk-100">
+                      {c.nameEn} ({c.nameBn})
+                    </span>
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        count > 0
+                          ? "bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                          : "bg-silk-100 text-silk-600 dark:bg-dark-elevated dark:text-silk-400"
+                      }`}
+                    >
+                      {count} {language === "bn" ? "টি পণ্য সংযুক্ত" : "products"}
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2 border-t border-silk-100 dark:border-dark-border">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsCategoryBulkDeleteModalOpen(false)}
+              disabled={isDeletingCategoryBulk}
+            >
+              {t.common.cancel}
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleConfirmBulkDeleteCategories}
+              disabled={isDeletingCategoryBulk}
+            >
+              <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+              <span>
+                {isDeletingCategoryBulk
+                  ? t.common.loading
+                  : language === "bn"
+                  ? `হ্যাঁ, ${selectedCategoryIds.length} টি ক্যাটাগরি মুছুন`
+                  : `Yes, Delete ${selectedCategoryIds.length} Categories`}
+              </span>
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
 
       {/* ========================================== */}
